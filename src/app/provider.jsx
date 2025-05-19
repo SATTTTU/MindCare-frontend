@@ -1,7 +1,7 @@
-export const AppProvider = ({ children }) => {
+export const Provider = ({ children }) => {
   return (
-    <div>
-      {children}
-    </div>
+	<div>
+	  {children}
+	</div>
   );
 }

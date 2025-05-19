@@ -1,9 +1,10 @@
-import { AppProvider } from "./provider";
+import * as React from "react";
+import Button from "@mui/material/Button";
 
 export const App = () => {
   return (
-    <AppProvider>
-      <AppRouter />
-    </AppProvider>
+    <Button variant="contained" color="primary">
+      Click Me
+    </Button>
   );
 };
