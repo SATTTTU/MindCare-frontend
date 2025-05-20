@@ -9,7 +9,6 @@ import {
   SvgIcon,
   Link,
 } from "@mui/material";
-import { ReactComponent as NotFoundIcon } from "./NotFoundIcon.svg"; // Optional SVG import
 
 export const NotFoundPage = () => {
   const navigate = useNavigate();

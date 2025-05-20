@@ -1,8 +1,7 @@
 import { lazy } from "react";
 import { Outlet } from "react-router-dom";
-import { AppRootErrorBoundary } from "./AppRootErrorBoundary"; // Adjust import as needed
 import { paths } from "./paths"; // Your defined path config
-import { AuthRoot } from "../app/root";
+import { AppRootErrorBoundary, AuthRoot } from "../app/root";
 
 export const therapistRoutes = [
   {
