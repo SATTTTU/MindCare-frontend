@@ -36,3 +36,10 @@ export const UserRoot = () => {
     </AppRootErrorBoundary>
   );
 };
+export const TherapistRoot = () => {
+  return (
+    <AppRootErrorBoundary>
+      <Outlet />
+    </AppRootErrorBoundary>
+  );
+};

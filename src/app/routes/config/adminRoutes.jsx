@@ -1,7 +1,7 @@
 import { lazy } from "react";
 import { Outlet } from "react-router-dom";
-import { paths } from "./paths"; // Your defined path config
 import { AppRootErrorBoundary, AuthRoot } from "../app/root";
+import { paths } from "@/config/paths";
 
 export const adminRoutes = [
   {
@@ -15,9 +15,9 @@ export const adminRoutes = [
           {
             path: paths.user.register.path,
             lazy: async () => {
-              const { RegisterPage } = await import("../register");
+              const { RegisterRoute } = await import("../../routes/user/auth/register");
               return {
-                Component: RegisterPage,
+                Component: RegisterRoute,
               };
             },
           },

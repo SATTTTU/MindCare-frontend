@@ -5,8 +5,9 @@ import { NotFoundPage } from "./routes/not-found";
 export const App = () => {
   return(
     <AppProvider>
-      <AppRouter />
+      <AppRouter >
       <NotFoundPage/>
+      </AppRouter>
     </AppProvider>
   );
 }

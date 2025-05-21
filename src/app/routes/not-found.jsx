@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -9,6 +8,7 @@ import {
   SvgIcon,
   Link,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export const NotFoundPage = () => {
   const navigate = useNavigate();
