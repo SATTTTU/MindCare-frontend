@@ -1,13 +1,13 @@
 export const userPaths = {
   root: {
-    path: "/",
+    path: "/user",
     getHref: () => "/",
   },
 
   register: {
-    path: "/register",
+    path: "register",
     getHref: (redirectTo) =>
-      `/register${
+      `/user/register${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },

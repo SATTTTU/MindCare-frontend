@@ -1,13 +1,13 @@
 export const therapistPaths = {
   root: {
-    path: "/",
-    getHref: () => "/",
+    path: "/therapist",
+    getHref: () => "/therapist",
   },
 
   register: {
-    path: "/register",
+    path: "therapist/register",
     getHref: (redirectTo) =>
-      `/register${
+      `therapist/register${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },

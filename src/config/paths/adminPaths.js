@@ -1,13 +1,13 @@
 export const adminPaths = {
   root: {
-    path: "/",
+    path: "/admin",
     getHref: () => "/",
   },
 
   register: {
-    path: "/register",
+    path: "/admin/register",
     getHref: (redirectTo) =>
-      `/register${
+      `/admin/register${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },

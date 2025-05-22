@@ -12,9 +12,9 @@ export const userRoutes = [
               {
                 path: paths.user.register.path,
                 lazy: async () => {
-                  const { RegisterRoute } = await import("../../routes/user/auth/register");
+                  const { RegisterForm } = await import("../../../modules/user/auth/components/register");
                   return {
-                    Component: RegisterRoute,
+                    Component: RegisterForm,
                   };
                 },
               },
