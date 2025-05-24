@@ -1,4 +1,7 @@
-    export const signUpSchema = z.object({
+   import { z } from "zod";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
+   export const signUpSchema = z.object({
     name: z
         .string()
         .min(1, "Full name is required")

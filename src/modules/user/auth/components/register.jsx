@@ -26,6 +26,8 @@ import {
 } from "@mui/icons-material";
 import { useUserRegisterFormik } from "../formik/useUserregisterformik";
 
+console.log("RegisterForm component is loading"); // Debug 1
+
 const focusedStyles = {
   "& .MuiOutlinedInput-root": {
     "&.Mui-focused fieldset": { borderColor: "#0e9300" },
@@ -40,57 +42,86 @@ const passwordRequirements = [
 ];
 
 export const RegisterForm = () => {
+  console.log("RegisterForm function is executing"); // Debug 2
+  
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  console.log("Hooks initialized", { showPassword, agreeTerms }); // Debug 3
+
+  const togglePasswordVisibility = () => {
+    console.log("Toggling password visibility", !showPassword); // Debug 4
+    setShowPassword(!showPassword);
+  };
 
   const { formik, isRegistering } = useUserRegisterFormik({
     mutationConfig: {
       onSuccess: (data) => {
-        console.log("Registration successful:", data);
+        console.log("Registration successful - onSuccess callback:", data); // Debug 5
         setTimeout(() => navigate("/login"), 2000);
       },
       onError: (error) => {
-        console.error("Registration failed:", error);
+        console.error("Registration failed - onError callback:", error); // Debug 6
       },
     },
   });
 
-  const renderTextField = (name, label, type, placeholder, Icon) => (
-    <TextField
-      fullWidth
-      name={name}
-      type={type}
-      label={label}
-      placeholder={placeholder}
-      value={formik.values[name]}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      error={formik.touched[name] && Boolean(formik.errors[name])}
-      helperText={formik.touched[name] && formik.errors[name]}
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="end">
-            {name === "password" ? (
-              <IconButton onClick={togglePasswordVisibility} edge="end" sx={{ color: "text.secondary" }}>
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            ) : (
-              <Icon sx={{ color: "text.secondary" }} />
-            )}
-          </InputAdornment>
-        ),
-      }}
-      sx={focusedStyles}
-    />
-  );
+  console.log("Formik state:", { 
+    values: formik.values, 
+    errors: formik.errors, 
+    touched: formik.touched,
+    isValid: formik.isValid,
+    isSubmitting: formik.isSubmitting
+  }); // Debug 7
+
+  const renderTextField = (name, label, type, placeholder, Icon) => {
+    console.log(`Rendering field ${name}`, { 
+      value: formik.values[name],
+      error: formik.touched[name] && Boolean(formik.errors[name]),
+      helperText: formik.touched[name] && formik.errors[name]
+    }); // Debug 8
+    
+    return (
+      <TextField
+        fullWidth
+        name={name}
+        type={type}
+        label={label}
+        placeholder={placeholder}
+        value={formik.values[name]}
+        onChange={(e) => {
+          console.log(`Field ${name} changed:`, e.target.value); // Debug 9
+          formik.handleChange(e);
+        }}
+        onBlur={formik.handleBlur}
+        error={formik.touched[name] && Boolean(formik.errors[name])}
+        helperText={formik.touched[name] && formik.errors[name]}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              {name === "password" ? (
+                <IconButton onClick={togglePasswordVisibility} edge="end" sx={{ color: "text.secondary" }}>
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              ) : (
+                <Icon sx={{ color: "text.secondary" }} />
+              )}
+            </InputAdornment>
+          ),
+        }}
+        sx={focusedStyles}
+      />
+    );
+  };
 
   return (
     <Box
       component="form"
-      onSubmit={formik.handleSubmit}
+      onSubmit={(e) => {
+        console.log("Form submitted", formik.values); // Debug 10
+        formik.handleSubmit(e);
+      }}
       sx={{
         width: { xs: "100%", md: "66.666%" },
         mx: "auto",
@@ -133,7 +164,10 @@ export const RegisterForm = () => {
         control={
           <Checkbox
             checked={agreeTerms}
-            onChange={(e) => setAgreeTerms(e.target.checked)}
+            onChange={(e) => {
+              console.log("Terms checkbox changed:", e.target.checked); // Debug 11
+              setAgreeTerms(e.target.checked);
+            }}
             sx={{ color: "#0e9300", "&.Mui-checked": { color: "#0e9300" } }}
           />
         }
@@ -195,7 +229,10 @@ export const RegisterForm = () => {
         <Typography variant="body1" color="text.secondary">
           Already have an account?{" "}
           <Link
-            onClick={() => navigate("/login")}
+            onClick={() => {
+              console.log("Navigate to login clicked"); // Debug 12
+              navigate("/login");
+            }}
             sx={{
               color: "#0e9300",
               cursor: "pointer",

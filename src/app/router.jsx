@@ -4,6 +4,7 @@ import { userRoutes } from "./routes/config/userRoutes";
 import { adminRoutes } from "./routes/config/adminRoutes";
 import { therapistRoutes } from "./routes/config/therapistRoute";
 import { notFoundRoute } from "./routes/config/notFoundRoute";
+import { Loader } from "@/components/ui/Loader";
 
 
 const createAppRouter = () => {
@@ -19,6 +20,6 @@ export const AppRouter = () => {
   const router = useMemo(() => createAppRouter(), []); 
 
   return (
-    <RouterProvider router={router} fallbackElement={<div>Loading...</div>} />
+    <RouterProvider router={router} fallbackElement={<Loader/>} />
   );
 };

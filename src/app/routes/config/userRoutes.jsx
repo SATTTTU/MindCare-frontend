@@ -7,7 +7,7 @@ export const userRoutes = [
   {
     path: paths.user.root.path,
     element: <Outlet />,
-    ErrorBoundary: AppRootErrorBoundary,
+    // ErrorBoundary: AppRootErrorBoundary,
     children: [
               {
                 path: paths.user.register.path,
