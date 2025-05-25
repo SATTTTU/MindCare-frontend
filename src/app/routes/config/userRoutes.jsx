@@ -18,6 +18,15 @@ export const userRoutes = [
                   };
                 },
               },
+              {
+                path: paths.user.login.path,
+                lazy: async () => {
+                  const { LoginForm } = await import("../../../modules/user/auth/components/login");
+                  return {
+                    Component: LoginForm,
+                  };
+                },
+              },
             ],
     
   },

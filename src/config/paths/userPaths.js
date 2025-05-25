@@ -1,6 +1,6 @@
 export const userPaths = {
   root: {
-    path: "/user",
+    path: "/",
     getHref: () => "/",
   },
 
@@ -11,4 +11,11 @@ export const userPaths = {
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
+  login:{
+    path: "login",
+    getHref: (redirectTo) =>
+      `/user/login${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
+  }
 };

@@ -5,8 +5,6 @@ import {
   TextField,
   Button,
   Typography,
-  Checkbox,
-  FormControlLabel,
   IconButton,
   InputAdornment,
   Paper,
@@ -18,13 +16,11 @@ import {
 import {
   Visibility,
   VisibilityOff,
-  Person,
   Email,
   Lock,
-  CheckCircle,
   Info,
 } from "@mui/icons-material";
-import { useUserRegisterFormik } from "../formik/useUserregisterformik";
+import { useUserLoginFormik } from "../formik/useUserloginformik";
 
 const focusedStyles = {
   "& .MuiOutlinedInput-root": {
@@ -33,27 +29,20 @@ const focusedStyles = {
   "& .MuiInputLabel-root.Mui-focused": { color: "#0e9300" },
 };
 
-const passwordRequirements = [
-  "At least one uppercase letter (A-Z)",
-  "At least one number (0-9)",
-  "At least one special character (!@#$%^&*)",
-];
-
-export const RegisterForm = () => {
+export const LoginForm = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  const { formik, isRegistering } = useUserRegisterFormik({
+  const { formik, isLoggingIn } = useUserLoginFormik({
     mutationConfig: {
       onSuccess: (data) => {
-        console.log("Registration successful:", data);
-        setTimeout(() => navigate("/login"), 2000);
+        console.log("Login successful:", data);
+        setTimeout(() => navigate("/dashboard"), 2000); // or home page
       },
       onError: (error) => {
-        console.error("Registration failed:", error);
+        console.error("Login failed:", error);
       },
     },
   });
@@ -101,63 +90,23 @@ export const RegisterForm = () => {
     >
       <Box textAlign="center" mb={4}>
         <Typography variant="h3" component="h1" sx={{ fontSize: { xs: "2rem", lg: "2.5rem" }, fontWeight: "bold", color: "#0e9300", mb: 1 }}>
-          Join Our Community
+          Welcome Back
         </Typography>
         <Typography variant="h6" color="text.secondary" sx={{ fontSize: "1.125rem" }}>
-          Start your journey to better mental wellness
+          Sign in to continue your journey
         </Typography>
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-        {renderTextField("name", "Full Name", "text", "Enter your full name", Person)}
-        {renderTextField("email", "Email Address", "email", "Enter your email address", Email)}
-        {renderTextField("password", "Password", showPassword ? "text" : "password", "Create a strong password", Lock)}
-
-        <Paper sx={{ backgroundColor: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 2, p: 2 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "#0c4a6e", mb: 1, display: "flex", alignItems: "center", gap: 1 }}>
-            <Lock fontSize="small" />
-            Password Requirements:
-          </Typography>
-          <Box sx={{ pl: 3 }}>
-            {passwordRequirements.map((req, i) => (
-              <Typography key={i} variant="caption" sx={{ display: "flex", alignItems: "center", color: "#0c4a6e", mb: 0.5 }}>
-                <CheckCircle sx={{ fontSize: 12, mr: 1, color: "#0e9300" }} />
-                {req}
-              </Typography>
-            ))}
-          </Box>
-        </Paper>
+        {renderTextField("email", "Email Address", "email", "Enter your email", Email)}
+        {renderTextField("password", "Password", showPassword ? "text" : "password", "Enter your password", Lock)}
       </Box>
-
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={agreeTerms}
-            onChange={(e) => setAgreeTerms(e.target.checked)}
-            sx={{ color: "#0e9300", "&.Mui-checked": { color: "#0e9300" } }}
-          />
-        }
-        label={
-          <Typography variant="body2" color="text.secondary">
-            I agree to the{" "}
-            <Link onClick={() => navigate("/terms")} sx={{ color: "#0e9300", cursor: "pointer", fontWeight: 500, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link onClick={() => navigate("/privacy")} sx={{ color: "#0e9300", cursor: "pointer", fontWeight: 500, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
-              Privacy Policy
-            </Link>
-            . I understand that my data will be handled securely and confidentially.
-          </Typography>
-        }
-        sx={{ mt: 3, alignItems: "flex-start" }}
-      />
 
       <Button
         type="submit"
         fullWidth
         variant="contained"
-        disabled={isRegistering || !formik.isValid || formik.isSubmitting || !agreeTerms}
+        disabled={isLoggingIn || !formik.isValid || formik.isSubmitting}
         sx={{
           py: 1.5,
           fontSize: "1.125rem",
@@ -175,13 +124,13 @@ export const RegisterForm = () => {
           borderRadius: 2,
         }}
       >
-        {isRegistering ? (
+        {isLoggingIn ? (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <CircularProgress size={20} sx={{ color: "white" }} />
-            Creating Account...
+            Signing In...
           </Box>
         ) : (
-          "Create Account"
+          "Sign In"
         )}
       </Button>
 
@@ -193,9 +142,9 @@ export const RegisterForm = () => {
 
       <Box textAlign="center" mt={3}>
         <Typography variant="body1" color="text.secondary">
-          Already have an account?{" "}
+          Don’t have an account?{" "}
           <Link
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/register")}
             sx={{
               color: "#0e9300",
               cursor: "pointer",
@@ -204,7 +153,7 @@ export const RegisterForm = () => {
               "&:hover": { textDecoration: "underline" },
             }}
           >
-            Sign in here
+            Register here
           </Link>
         </Typography>
       </Box>
@@ -221,7 +170,7 @@ export const RegisterForm = () => {
         }}
       >
         <Typography variant="body2">
-          <strong>Your privacy matters.</strong> All information is encrypted and confidential. We're here to support your mental wellness journey in a safe, secure environment.
+          <strong>Secure Login:</strong> Your credentials are encrypted and never shared.
         </Typography>
       </Alert>
     </Box>
