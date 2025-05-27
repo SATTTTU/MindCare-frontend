@@ -17,5 +17,12 @@ export const userPaths = {
       `/user/login${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
+  },
+  journel:{
+    path: "journel",
+    getHref: (redirectTo) =>
+      `/user/journel${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
   }
 };

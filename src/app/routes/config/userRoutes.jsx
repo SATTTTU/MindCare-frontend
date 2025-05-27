@@ -27,6 +27,15 @@ export const userRoutes = [
                   };
                 },
               },
+               {
+                path: paths.user.journel.path,
+                lazy: async () => {
+                  const { JournalComponent } = await import("../../../modules/user/journel/components/inputJournel");
+                  return {
+                    Component: JournalComponent,
+                  };
+                },
+              },
             ],
     
   },
