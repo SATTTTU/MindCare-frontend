@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 
 // Function to call the login API endpoint
 const loginUser = async (userData) => {
-  const response = await api.post("/api/login", userData); // Adjust the path if needed
+  const response = await api.post("/api/Users/login", userData); // Adjust the path if needed
   return response.data;
 };
 

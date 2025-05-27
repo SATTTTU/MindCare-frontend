@@ -264,7 +264,7 @@ if (!API_URL) {
 // Create Axios instance
 export const api = Axios.create({
   baseURL: API_URL,
-  withCredentials: true,
+  withCredentials: false,
 });
 
 console.log("🌍 API Base URL:", API_URL);

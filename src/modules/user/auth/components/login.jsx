@@ -7,19 +7,12 @@ import {
   Typography,
   IconButton,
   InputAdornment,
-  Paper,
   Alert,
   Link,
   CircularProgress,
   Divider,
 } from "@mui/material";
-import {
-  Visibility,
-  VisibilityOff,
-  Email,
-  Lock,
-  Info,
-} from "@mui/icons-material";
+import { Visibility, VisibilityOff, Email, Lock, Info } from "@mui/icons-material";
 import { useUserLoginFormik } from "../formik/useUserloginformik";
 
 const focusedStyles = {
@@ -37,12 +30,8 @@ export const LoginForm = () => {
 
   const { formik, isLoggingIn } = useUserLoginFormik({
     mutationConfig: {
-      onSuccess: (data) => {
-        console.log("Login successful:", data);
-        setTimeout(() => navigate("/dashboard"), 2000); // or home page
-      },
-      onError: (error) => {
-        console.error("Login failed:", error);
+      onSuccess: () => {
+        setTimeout(() => navigate("/dashboard"), 2000);
       },
     },
   });
@@ -71,6 +60,7 @@ export const LoginForm = () => {
             )}
           </InputAdornment>
         ),
+        autoComplete: name === "password" ? "current-password" : "email",
       }}
       sx={focusedStyles}
     />
@@ -87,6 +77,8 @@ export const LoginForm = () => {
         flexDirection: "column",
         justifyContent: "center",
       }}
+      noValidate
+      autoComplete="off"
     >
       <Box textAlign="center" mb={4}>
         <Typography variant="h3" component="h1" sx={{ fontSize: { xs: "2rem", lg: "2.5rem" }, fontWeight: "bold", color: "#0e9300", mb: 1 }}>

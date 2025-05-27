@@ -22,15 +22,6 @@ import { toast } from "react-toastify";
         .regex(/[\W_]/, "Password must contain at least one special character"),
     });
     export const loginSchema = z.object({
-    username: z
-        .string()
-        .min(1, "Username or email is required")
-        .max(100, "Username must be less than 100 characters"),
-    password: z
-        .string()
-        .min(1, "Password is required")
-        .min(6, "Password must be at least 6 characters")
-        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-        .regex(/[0-9]/, "Password must contain at least one number")
-        .regex(/[\W_]/, "Password must contain at least one special character"),
-    });
+  email: z.string().email("Please enter a valid email address").nonempty("Email is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});

@@ -2,7 +2,7 @@ import { api } from "@/lib/api-client";
 import { useMutation } from "@tanstack/react-query";
 
 const registerUser = async (userData) => {
-  const response = await api.post("/api/register", userData);
+  const response = await api.post("/api/Users/register", userData);
   return response.data;
 };
 

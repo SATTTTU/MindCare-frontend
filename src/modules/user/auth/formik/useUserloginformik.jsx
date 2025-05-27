@@ -12,12 +12,12 @@ export const useUserLoginFormik = (config = {}) => {
 
   const formik = useFormik({
     initialValues: {
-      username: "", // can be either username or email
+      email: "",
       password: "",
     },
     validationSchema: toFormikValidationSchema(loginSchema),
     validateOnBlur: true,
-    validateOnChange: false,
+    validateOnChange: true, // <-- Change here: validate on change for better feedback
     onSubmit: async (values, helpers) => {
       try {
         const result = await mutateAsync(values);
@@ -40,7 +40,7 @@ export const useUserLoginFormik = (config = {}) => {
           const message = err.response?.data?.message || "Login failed";
 
           if (status === 401) {
-            helpers.setErrors({ submit: "Invalid username or password." });
+            helpers.setErrors({ submit: "Invalid email or password." });
             toast.error("❌ Invalid credentials. Please try again!", {
               position: "top-right",
               autoClose: 3000,
@@ -70,4 +70,4 @@ export const useUserLoginFormik = (config = {}) => {
   });
 
   return { formik, isLoggingIn };
-};  
+};
