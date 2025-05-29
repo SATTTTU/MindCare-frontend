@@ -1,47 +1,19 @@
 import { useJournalFormik } from "../formik/useJournelFormik";
 
 export const JournalComponent = () => {
-  // Initialize API hook
-  const { mutateAsync: saveJournal, isLoading: apiIsLoading, isSuccess: apiIsSuccess, error: apiError } = useSaveJournal();
-  
-  // Initialize Formik hook
-  const formik = useJournalFormik({
-    onSubmit: async (values) => {
-      await saveJournal(values);
-    }
-  });
-
-  // Local state for UI
-  const [showSuccess, setShowSuccess] = useState(false);
+  // Initialize Formik hook with all submission handling
+  const formik = useJournalFormik();
 
   const moods = [
-    { emoji: '😊', label: 'Happy', color: '#FFF3E0' },
-    { emoji: '😌', label: 'Calm', color: '#E3F2FD' },
-    { emoji: '😐', label: 'Neutral', color: '#F5F5F5' },
-    { emoji: '😢', label: 'Sad', color: '#E1F5FE' },
-    { emoji: '😠', label: 'Angry', color: '#FFEBEE' },
-    { emoji: '😰', label: 'Anxious', color: '#F3E5F5' },
-    { emoji: '😴', label: 'Tired', color: '#E8EAF6' },
-    { emoji: '🤗', label: 'Grateful', color: '#FCE4EC' }
+    { emoji: '😊', label: 'happy', color: '#FFF3E0' },
+    { emoji: '😌', label: 'calm', color: '#E3F2FD' },
+    { emoji: '😐', label: 'neutral', color: '#F5F5F5' },
+    { emoji: '😢', label: 'sad', color: '#E1F5FE' },
+    { emoji: '😠', label: 'angry', color: '#FFEBEE' },
+    { emoji: '😰', label: 'anxious', color: '#F3E5F5' },
+    { emoji: '😴', label: 'tired', color: '#E8EAF6' },
+    { emoji: '🤗', label: 'grateful', color: '#FCE4EC' }
   ];
-
-  // Handle save button click - now integrated with Formik and API
-  const handleSaveEntry = async () => {
-    if (!formik.values.mood && !formik.values.content.trim()) {
-      return;
-    }
-
-    // Trigger Formik submission which will validate and call API
-    await formik.handleSubmit();
-    
-    // Show success message if API call was successful
-    if (apiIsSuccess || formik.status?.success) {
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-      }, 3000);
-    }
-  };
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -53,10 +25,6 @@ export const JournalComponent = () => {
     });
   };
 
-  // Determine loading state (either Formik submitting or API loading)
-  const isSaving = formik.isSubmitting || apiIsLoading;
-
-  // Material Design inspired styles
   const styles = {
     container: {
       minHeight: '100vh',
@@ -110,7 +78,7 @@ export const JournalComponent = () => {
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
       gap: '12px',
-      marginBottom: '48px'
+      marginBottom: '24px'
     },
     moodButton: {
       border: 'none',
@@ -121,11 +89,7 @@ export const JournalComponent = () => {
       transition: 'all 0.2s ease-in-out',
       position: 'relative',
       outline: 'none',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-      ':hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)'
-      }
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
     },
     moodEmoji: {
       fontSize: '2rem',
@@ -137,8 +101,16 @@ export const JournalComponent = () => {
       fontWeight: '500',
       color: '#424242'
     },
-    textareaContainer: {
-      marginBottom: '32px'
+    inputField: {
+      width: '100%',
+      padding: '12px 16px',
+      border: '2px solid #E0E0E0',
+      borderRadius: '8px',
+      fontSize: '1rem',
+      fontFamily: 'inherit',
+      outline: 'none',
+      transition: 'border-color 0.2s ease-in-out',
+      marginBottom: '16px'
     },
     textarea: {
       width: '100%',
@@ -151,8 +123,7 @@ export const JournalComponent = () => {
       resize: 'vertical',
       outline: 'none',
       transition: 'border-color 0.2s ease-in-out',
-      lineHeight: '1.5',
-      backgroundColor: '#fafafa'
+      lineHeight: '1.5'
     },
     saveButton: {
       backgroundColor: '#2196F3',
@@ -176,82 +147,17 @@ export const JournalComponent = () => {
       cursor: 'not-allowed',
       boxShadow: 'none'
     },
-    successSnackbar: {
-      position: 'fixed',
-      bottom: '24px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      backgroundColor: '#4CAF50',
-      color: 'white',
-      padding: '12px 24px',
-      borderRadius: '24px',
-      boxShadow: '0 4px 16px rgba(76, 175, 80, 0.3)',
-      display: 'flex',
-      alignItems: 'center',
-      animation: 'fadeIn 0.3s ease-in-out'
-    },
-    errorSnackbar: {
-      position: 'fixed',
-      bottom: '24px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      backgroundColor: '#f44336',
-      color: 'white',
-      padding: '12px 24px',
-      borderRadius: '24px',
-      boxShadow: '0 4px 16px rgba(244, 67, 54, 0.3)',
-      display: 'flex',
-      alignItems: 'center',
-      animation: 'fadeIn 0.3s ease-in-out'
-    },
-    tipCard: {
-      backgroundColor: '#f8f9fa',
-      borderRadius: '12px',
-      padding: '24px',
-      border: '1px solid #E0E0E0',
-      maxWidth: '800px',
-      margin: '0 auto'
-    },
-    tipHeader: {
-      display: 'flex',
-      alignItems: 'flex-start',
-      marginBottom: '8px'
-    },
-    tipIcon: {
-      width: '32px',
-      height: '32px',
-      borderRadius: '50%',
-      backgroundColor: '#E3F2FD',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: '16px',
-      flexShrink: 0
-    },
-    tipTitle: {
-      fontSize: '1.125rem',
-      fontWeight: '500',
-      color: '#424242',
-      marginBottom: '8px'
-    },
-    tipText: {
-      fontSize: '0.875rem',
-      color: '#757575',
-      lineHeight: '1.5'
-    },
-    spinner: {
-      width: '20px',
-      height: '20px',
-      border: '2px solid transparent',
-      borderTop: '2px solid white',
-      borderRadius: '50%',
-      animation: 'spin 1s linear infinite',
-      marginRight: '8px'
-    },
     errorText: {
       color: '#f44336',
       fontSize: '0.875rem',
-      marginTop: '4px'
+      marginTop: '4px',
+      marginBottom: '16px'
+    },
+    characterCount: {
+      textAlign: 'right', 
+      fontSize: '0.875rem', 
+      color: '#757575', 
+      marginTop: '8px'
     }
   };
 
@@ -264,8 +170,8 @@ export const JournalComponent = () => {
             100% { transform: rotate(360deg); }
           }
           @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
           }
           @media (max-width: 768px) {
             .mood-grid {
@@ -294,137 +200,102 @@ export const JournalComponent = () => {
           </p>
         </div>
 
-        <div>
-          <h2 style={styles.sectionTitle}>Select your mood</h2>
-          <div style={styles.moodGrid} className="mood-grid">
-            {moods.map((mood, index) => (
-              <button
-                key={index}
-                onClick={() => formik.setFieldValue('mood', mood.label)}
-                style={{
-                  ...styles.moodButton,
-                  backgroundColor: mood.color,
-                  transform: formik.values.mood === mood.label ? 'translateY(-2px) scale(1.05)' : 'none',
-                  boxShadow: formik.values.mood === mood.label 
-                    ? '0 4px 16px rgba(33, 150, 243, 0.3), 0 0 0 2px #2196F3' 
-                    : '0 2px 8px rgba(0, 0, 0, 0.1)'
-                }}
-                onMouseEnter={(e) => {
-                  if (formik.values.mood !== mood.label) {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.15)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (formik.values.mood !== mood.label) {
-                    e.target.style.transform = 'none';
-                    e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
-                  }
-                }}
-              >
-                <span style={styles.moodEmoji}>{mood.emoji}</span>
-                <div style={styles.moodLabel}>{mood.label}</div>
-              </button>
-            ))}
-          </div>
-          {formik.errors.mood && (
-            <div style={styles.errorText}>{formik.errors.mood}</div>
-          )}
-        </div>
-
-        <div style={styles.textareaContainer}>
-          <h2 style={styles.sectionTitle}>Share your thoughts</h2>
-          <textarea
-            value={formik.values.content}
-            onChange={(e) => formik.setFieldValue('content', e.target.value)}
-            placeholder="What's on your mind today? How was your day? What are you grateful for? Write freely..."
-            style={{
-              ...styles.textarea,
-              borderColor: formik.values.content ? '#2196F3' : '#E0E0E0'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = '#2196F3';
-              e.target.style.boxShadow = '0 0 0 2px rgba(33, 150, 243, 0.2)';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = formik.values.content ? '#2196F3' : '#E0E0E0';
-              e.target.style.boxShadow = 'none';
-            }}
-          />
-          <div style={{ 
-            textAlign: 'right', 
-            fontSize: '0.875rem', 
-            color: '#757575', 
-            marginTop: '8px' 
-          }}>
-            {formik.values.content.length} characters
-          </div>
-          {formik.errors.content && (
-            <div style={styles.errorText}>{formik.errors.content}</div>
-          )}
-        </div>
-
-        <button
-          onClick={handleSaveEntry}
-          disabled={isSaving || (!formik.values.mood && !formik.values.content.trim())}
-          style={{
-            ...styles.saveButton,
-            ...((!formik.values.mood && !formik.values.content.trim()) ? styles.saveButtonDisabled : {}),
-            transform: (!formik.values.mood && !formik.values.content.trim()) ? 'none' : 'scale(1)',
-          }}
-          onMouseEnter={(e) => {
-            if (!e.target.disabled) {
-              e.target.style.transform = 'scale(1.05)';
-              e.target.style.backgroundColor = '#1976D2';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!e.target.disabled) {
-              e.target.style.transform = 'scale(1)';
-              e.target.style.backgroundColor = '#2196F3';
-            }
-          }}
-        >
-          {isSaving ? (
-            <>
-              <div style={styles.spinner}></div>
-              Saving...
-            </>
-          ) : (
-            'Save Entry'
-          )}
-        </button>
-      </div>
-
-      {/* Success Message */}
-      {showSuccess && (
-        <div style={styles.successSnackbar}>
-          <span style={{ marginRight: '8px', fontSize: '1.25rem' }}>✓</span>
-          Entry saved successfully!
-        </div>
-      )}
-
-      {/* Error Message */}
-      {formik.status?.error && (
-        <div style={styles.errorSnackbar}>
-          <span style={{ marginRight: '8px', fontSize: '1.25rem' }}>⚠</span>
-          {formik.status.message}
-        </div>
-      )}
-
-      <div style={styles.tipCard}>
-        <div style={styles.tipHeader}>
-          <div style={styles.tipIcon}>
-            <span style={{ fontSize: '1rem' }}>💡</span>
-          </div>
+        <form onSubmit={formik.handleSubmit}>
           <div>
-            <h3 style={styles.tipTitle}>Daily Tip</h3>
-            <p style={styles.tipText}>
-              Regular journaling can help improve your mental clarity and emotional well-being. 
-              Try to write for just 5 minutes each day to build a healthy habit.
-            </p>
+            <h2 style={styles.sectionTitle}>Title</h2>
+            <input
+              type="text"
+              name="title"
+              value={formik.values.title}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Give your journal entry a title"
+              style={{
+                ...styles.inputField,
+                borderColor: formik.errors.title ? '#f44336' : 
+                          formik.values.title ? '#2196F3' : '#E0E0E0'
+              }}
+            />
+            {formik.errors.title && formik.touched.title && (
+              <div style={styles.errorText}>{formik.errors.title}</div>
+            )}
           </div>
-        </div>
+
+          <div>
+            <h2 style={styles.sectionTitle}>Select your mood</h2>
+            <div style={styles.moodGrid} className="mood-grid">
+              {moods.map((mood, index) => (
+                <button
+                  type="button"
+                  key={index}
+                  onClick={() => formik.setFieldValue('mood', mood.label)}
+                  style={{
+                    ...styles.moodButton,
+                    backgroundColor: mood.color,
+                    transform: formik.values.mood === mood.label ? 'translateY(-2px) scale(1.05)' : 'none',
+                    boxShadow: formik.values.mood === mood.label 
+                      ? '0 4px 16px rgba(33, 150, 243, 0.3), 0 0 0 2px #2196F3' 
+                      : '0 2px 8px rgba(0, 0, 0, 0.1)'
+                  }}
+                >
+                  <span style={styles.moodEmoji}>{mood.emoji}</span>
+                  <div style={styles.moodLabel}>{mood.label.charAt(0).toUpperCase() + mood.label.slice(1)}</div>
+                </button>
+              ))}
+            </div>
+            {formik.errors.mood && formik.touched.mood && (
+              <div style={styles.errorText}>{formik.errors.mood}</div>
+            )}
+          </div>
+
+          <div>
+            <h2 style={styles.sectionTitle}>Share your thoughts</h2>
+            <textarea
+              name="content"
+              value={formik.values.content}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="What's on your mind today? How was your day? What are you grateful for? Write freely..."
+              style={{
+                ...styles.textarea,
+                borderColor: formik.errors.content ? '#f44336' : 
+                            formik.values.content ? '#2196F3' : '#E0E0E0'
+              }}
+            />
+            <div style={styles.characterCount}>
+              {formik.values.content.length} characters
+            </div>
+            {formik.errors.content && formik.touched.content && (
+              <div style={styles.errorText}>{formik.errors.content}</div>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={formik.isSubmitting}
+            style={{
+              ...styles.saveButton,
+              ...(formik.isSubmitting ? styles.saveButtonDisabled : {}),
+            }}
+          >
+            {formik.isSubmitting ? (
+              <>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  border: '2px solid transparent',
+                  borderTop: '2px solid white',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  marginRight: '8px'
+                }}></div>
+                Saving...
+              </>
+            ) : (
+              'Save Entry'
+            )}
+          </button>
+        </form>
       </div>
     </div>
   );
