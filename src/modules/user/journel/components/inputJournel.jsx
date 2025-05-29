@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import { useJournalFormik } from "../formik/useJournelFormik";
 
+export const JournalComponent = () => {
+  // Initialize API hook
+  const { mutateAsync: saveJournal, isLoading: apiIsLoading, isSuccess: apiIsSuccess, error: apiError } = useSaveJournal();
+  
+  // Initialize Formik hook
+  const formik = useJournalFormik({
+    onSubmit: async (values) => {
+      await saveJournal(values);
+    }
+  });
 
-
- export const JournalComponent = () => {
-  const [selectedMood, setSelectedMood] = useState('');
-  const [journalEntry, setJournalEntry] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  // Local state for UI
   const [showSuccess, setShowSuccess] = useState(false);
 
   const moods = [
@@ -19,21 +25,22 @@ import React, { useState } from 'react';
     { emoji: '🤗', label: 'Grateful', color: '#FCE4EC' }
   ];
 
+  // Handle save button click - now integrated with Formik and API
   const handleSaveEntry = async () => {
-    if (!selectedMood && !journalEntry.trim()) {
+    if (!formik.values.mood && !formik.values.content.trim()) {
       return;
     }
 
-    setIsSaving(true);
+    // Trigger Formik submission which will validate and call API
+    await formik.handleSubmit();
     
-    setTimeout(() => {
-      setIsSaving(false);
+    // Show success message if API call was successful
+    if (apiIsSuccess || formik.status?.success) {
       setShowSuccess(true);
-      
       setTimeout(() => {
         setShowSuccess(false);
       }, 3000);
-    }, 1000);
+    }
   };
 
   const getCurrentDate = () => {
@@ -45,6 +52,9 @@ import React, { useState } from 'react';
       day: 'numeric'
     });
   };
+
+  // Determine loading state (either Formik submitting or API loading)
+  const isSaving = formik.isSubmitting || apiIsLoading;
 
   // Material Design inspired styles
   const styles = {
@@ -180,6 +190,20 @@ import React, { useState } from 'react';
       alignItems: 'center',
       animation: 'fadeIn 0.3s ease-in-out'
     },
+    errorSnackbar: {
+      position: 'fixed',
+      bottom: '24px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      backgroundColor: '#f44336',
+      color: 'white',
+      padding: '12px 24px',
+      borderRadius: '24px',
+      boxShadow: '0 4px 16px rgba(244, 67, 54, 0.3)',
+      display: 'flex',
+      alignItems: 'center',
+      animation: 'fadeIn 0.3s ease-in-out'
+    },
     tipCard: {
       backgroundColor: '#f8f9fa',
       borderRadius: '12px',
@@ -223,6 +247,11 @@ import React, { useState } from 'react';
       borderRadius: '50%',
       animation: 'spin 1s linear infinite',
       marginRight: '8px'
+    },
+    errorText: {
+      color: '#f44336',
+      fontSize: '0.875rem',
+      marginTop: '4px'
     }
   };
 
@@ -271,23 +300,23 @@ import React, { useState } from 'react';
             {moods.map((mood, index) => (
               <button
                 key={index}
-                onClick={() => setSelectedMood(mood.label)}
+                onClick={() => formik.setFieldValue('mood', mood.label)}
                 style={{
                   ...styles.moodButton,
                   backgroundColor: mood.color,
-                  transform: selectedMood === mood.label ? 'translateY(-2px) scale(1.05)' : 'none',
-                  boxShadow: selectedMood === mood.label 
+                  transform: formik.values.mood === mood.label ? 'translateY(-2px) scale(1.05)' : 'none',
+                  boxShadow: formik.values.mood === mood.label 
                     ? '0 4px 16px rgba(33, 150, 243, 0.3), 0 0 0 2px #2196F3' 
                     : '0 2px 8px rgba(0, 0, 0, 0.1)'
                 }}
                 onMouseEnter={(e) => {
-                  if (selectedMood !== mood.label) {
+                  if (formik.values.mood !== mood.label) {
                     e.target.style.transform = 'translateY(-2px)';
                     e.target.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.15)';
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (selectedMood !== mood.label) {
+                  if (formik.values.mood !== mood.label) {
                     e.target.style.transform = 'none';
                     e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
                   }
@@ -298,24 +327,27 @@ import React, { useState } from 'react';
               </button>
             ))}
           </div>
+          {formik.errors.mood && (
+            <div style={styles.errorText}>{formik.errors.mood}</div>
+          )}
         </div>
 
         <div style={styles.textareaContainer}>
           <h2 style={styles.sectionTitle}>Share your thoughts</h2>
           <textarea
-            value={journalEntry}
-            onChange={(e) => setJournalEntry(e.target.value)}
+            value={formik.values.content}
+            onChange={(e) => formik.setFieldValue('content', e.target.value)}
             placeholder="What's on your mind today? How was your day? What are you grateful for? Write freely..."
             style={{
               ...styles.textarea,
-              borderColor: journalEntry ? '#2196F3' : '#E0E0E0'
+              borderColor: formik.values.content ? '#2196F3' : '#E0E0E0'
             }}
             onFocus={(e) => {
               e.target.style.borderColor = '#2196F3';
               e.target.style.boxShadow = '0 0 0 2px rgba(33, 150, 243, 0.2)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = journalEntry ? '#2196F3' : '#E0E0E0';
+              e.target.style.borderColor = formik.values.content ? '#2196F3' : '#E0E0E0';
               e.target.style.boxShadow = 'none';
             }}
           />
@@ -325,17 +357,20 @@ import React, { useState } from 'react';
             color: '#757575', 
             marginTop: '8px' 
           }}>
-            {journalEntry.length} characters
+            {formik.values.content.length} characters
           </div>
+          {formik.errors.content && (
+            <div style={styles.errorText}>{formik.errors.content}</div>
+          )}
         </div>
 
         <button
           onClick={handleSaveEntry}
-          disabled={isSaving || (!selectedMood && !journalEntry.trim())}
+          disabled={isSaving || (!formik.values.mood && !formik.values.content.trim())}
           style={{
             ...styles.saveButton,
-            ...((!selectedMood && !journalEntry.trim()) ? styles.saveButtonDisabled : {}),
-            transform: (!selectedMood && !journalEntry.trim()) ? 'none' : 'scale(1)',
+            ...((!formik.values.mood && !formik.values.content.trim()) ? styles.saveButtonDisabled : {}),
+            transform: (!formik.values.mood && !formik.values.content.trim()) ? 'none' : 'scale(1)',
           }}
           onMouseEnter={(e) => {
             if (!e.target.disabled) {
@@ -361,10 +396,19 @@ import React, { useState } from 'react';
         </button>
       </div>
 
+      {/* Success Message */}
       {showSuccess && (
         <div style={styles.successSnackbar}>
           <span style={{ marginRight: '8px', fontSize: '1.25rem' }}>✓</span>
           Entry saved successfully!
+        </div>
+      )}
+
+      {/* Error Message */}
+      {formik.status?.error && (
+        <div style={styles.errorSnackbar}>
+          <span style={{ marginRight: '8px', fontSize: '1.25rem' }}>⚠</span>
+          {formik.status.message}
         </div>
       )}
 
