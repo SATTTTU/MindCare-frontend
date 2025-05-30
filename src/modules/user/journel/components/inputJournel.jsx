@@ -1,7 +1,6 @@
 import { useJournalFormik } from "../formik/useJournelFormik";
 
 export const JournalComponent = () => {
-  // Initialize Formik hook with all submission handling
   const formik = useJournalFormik();
 
   const moods = [
@@ -153,6 +152,12 @@ export const JournalComponent = () => {
       marginTop: '4px',
       marginBottom: '16px'
     },
+    successText: {
+      color: '#4CAF50',
+      fontSize: '0.875rem',
+      textAlign: 'center',
+      marginBottom: '16px'
+    },
     characterCount: {
       textAlign: 'right', 
       fontSize: '0.875rem', 
@@ -200,6 +205,18 @@ export const JournalComponent = () => {
           </p>
         </div>
 
+        {formik.status?.error && (
+          <div style={styles.errorText}>
+            {formik.status.message}
+          </div>
+        )}
+
+        {formik.status?.success && (
+          <div style={styles.successText}>
+            {formik.status.message}
+          </div>
+        )}
+
         <form onSubmit={formik.handleSubmit}>
           <div>
             <h2 style={styles.sectionTitle}>Title</h2>
@@ -213,7 +230,7 @@ export const JournalComponent = () => {
               style={{
                 ...styles.inputField,
                 borderColor: formik.errors.title ? '#f44336' : 
-                          formik.values.title ? '#2196F3' : '#E0E0E0'
+                            formik.values.title ? '#2196F3' : '#E0E0E0'
               }}
             />
             {formik.errors.title && formik.touched.title && (
@@ -270,31 +287,31 @@ export const JournalComponent = () => {
             )}
           </div>
 
-          <button
-            type="submit"
-            disabled={formik.isSubmitting}
-            style={{
-              ...styles.saveButton,
-              ...(formik.isSubmitting ? styles.saveButtonDisabled : {}),
-            }}
-          >
-            {formik.isSubmitting ? (
-              <>
-                <div style={{
-                  width: '20px',
-                  height: '20px',
-                  border: '2px solid transparent',
-                  borderTop: '2px solid white',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  marginRight: '8px'
-                }}></div>
-                Saving...
-              </>
-            ) : (
-              'Save Entry'
-            )}
-          </button>
+<button
+  type="submit"
+  disabled={formik.isSubmitting}
+  style={{
+    ...styles.saveButton,
+    ...(formik.isSubmitting ? styles.saveButtonDisabled : {}),
+  }}
+>
+  {formik.isSubmitting ? (
+    <>
+      <div style={{
+        width: '20px',
+        height: '20px',
+        border: '2px solid transparent',
+        borderTop: '2px solid white',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite',
+        marginRight: '8px'
+      }}></div>
+      Saving...
+    </>
+  ) : (
+    'Save Entry'
+  )}
+</button>
         </form>
       </div>
     </div>

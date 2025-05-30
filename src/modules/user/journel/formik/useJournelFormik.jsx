@@ -4,7 +4,7 @@ import { journalValidationSchema } from "./schema/journelschema";
 import { useSaveJournal } from "../api/saveJournel";
 
 export const useJournalFormik = () => {
-  const { mutateAsync } = useSaveJournal();
+  const { mutateAsync, isLoading, error: apiError } = useSaveJournal();
 
   const formik = useFormik({
     initialValues: {
@@ -19,12 +19,17 @@ export const useJournalFormik = () => {
     onSubmit: async (values, { setStatus, setSubmitting, resetForm }) => {
       try {
         await mutateAsync(values);
-        setStatus({ success: true, message: "Journal saved successfully" });
+        setStatus({ 
+          success: true, 
+          message: "Journal saved successfully!",
+          error: null
+        });
         resetForm();
       } catch (error) {
         setStatus({ 
           error: true, 
-          message: error.response?.data?.message || "Failed to save journal" 
+          message: error.message || "Failed to save journal. Please try again.",
+          success: false
         });
       } finally {
         setSubmitting(false);
@@ -32,5 +37,9 @@ export const useJournalFormik = () => {
     },
   });
 
-  return formik;
+  return {
+    ...formik,
+    isSubmitting: isLoading,
+    apiError
+  };
 };
