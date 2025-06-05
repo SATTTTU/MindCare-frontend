@@ -6,7 +6,7 @@ export const journalValidationSchema = z.object({
     .min(3, { message: "title must be at least 3 characters long" })
     .max(100, { message: "title cannot exceed 100 characters" }),
   
-  content: z
+  text: z
     .string()
     .min(10, { message: "content must be at least 10 characters long" })
     .max(5000, { message: "content cannot exceed 5000 characters" })

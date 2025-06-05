@@ -9,7 +9,7 @@ export const useJournalFormik = () => {
   const formik = useFormik({
     initialValues: {
       title: "",
-      content: "",
+      text: "",
       mood: "",
       date: new Date().toISOString().split("T")[0],
     },

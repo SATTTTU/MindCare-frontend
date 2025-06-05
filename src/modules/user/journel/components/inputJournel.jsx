@@ -268,22 +268,22 @@ export const JournalComponent = () => {
           <div>
             <h2 style={styles.sectionTitle}>Share your thoughts</h2>
             <textarea
-              name="content"
-              value={formik.values.content}
+              name="text"
+              value={formik.values.text}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               placeholder="What's on your mind today? How was your day? What are you grateful for? Write freely..."
               style={{
                 ...styles.textarea,
-                borderColor: formik.errors.content ? '#f44336' : 
-                            formik.values.content ? '#2196F3' : '#E0E0E0'
+                borderColor: formik.errors.text ? '#f44336' : 
+                            formik.values.text ? '#2196F3' : '#E0E0E0'
               }}
             />
             <div style={styles.characterCount}>
-              {formik.values.content.length} characters
+              {formik.values.text.length} characters
             </div>
-            {formik.errors.content && formik.touched.content && (
-              <div style={styles.errorText}>{formik.errors.content}</div>
+            {formik.errors.text && formik.touched.text && (
+              <div style={styles.errorText}>{formik.errors.text}</div>
             )}
           </div>
 

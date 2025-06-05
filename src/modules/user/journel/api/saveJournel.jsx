@@ -9,7 +9,7 @@ export const useSaveJournal = () => {
     };
 
     const response = await axios.post(
-      "http://localhost:3001/api/journals",
+      "http://localhost:3000/api/Journal/create",
       transformedData,
       {
         headers: {
