@@ -17,9 +17,9 @@ import { useUserLoginFormik } from "../formik/useUserloginformik";
 
 const focusedStyles = {
   "& .MuiOutlinedInput-root": {
-    "&.Mui-focused fieldset": { borderColor: "#0e9300" },
+    "&.Mui-focused fieldset": { borderColor: "#a78bfa" },
   },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#0e9300" },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#a78bfa" },
 };
 
 export const LoginForm = () => {
@@ -81,7 +81,18 @@ export const LoginForm = () => {
       autoComplete="off"
     >
       <Box textAlign="center" mb={4}>
-        <Typography variant="h3" component="h1" sx={{ fontSize: { xs: "2rem", lg: "2.5rem" }, fontWeight: "bold", color: "#0e9300", mb: 1 }}>
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{
+            fontSize: { xs: "2rem", lg: "2.5rem" },
+            fontWeight: "bold",
+            background: "linear-gradient(to right, #c084fc, #38bdf8)",
+            WebkitBackgroundClip: "text",
+            color: "transparent",
+            mb: 1,
+          }}
+        >
           Welcome Back
         </Typography>
         <Typography variant="h6" color="text.secondary" sx={{ fontSize: "1.125rem" }}>
@@ -104,16 +115,17 @@ export const LoginForm = () => {
           fontSize: "1.125rem",
           fontWeight: 500,
           mt: 3,
-          backgroundColor: "#238f17",
+          backgroundColor: "#a78bfa",
+          borderRadius: 2,
+          color: "#fff",
           "&:hover": {
-            backgroundColor: "#1e7a14",
-            boxShadow: "0 4px 12px rgba(35, 143, 23, 0.3)",
+            backgroundColor: "#8b5cf6",
+            boxShadow: "0 4px 12px rgba(167, 139, 250, 0.4)",
           },
           "&:disabled": {
             backgroundColor: "#e5e7eb",
             color: "#9ca3af",
           },
-          borderRadius: 2,
         }}
       >
         {isLoggingIn ? (
@@ -138,7 +150,7 @@ export const LoginForm = () => {
           <Link
             onClick={() => navigate("/register")}
             sx={{
-              color: "#0e9300",
+              color: "#7c3aed",
               cursor: "pointer",
               fontWeight: 500,
               textDecoration: "none",
@@ -156,9 +168,9 @@ export const LoginForm = () => {
         severity="info"
         icon={<Info />}
         sx={{
-          backgroundColor: "#f0f9ff",
-          border: "1px solid #bae6fd",
-          "& .MuiAlert-icon": { color: "#0e9300" },
+          backgroundColor: "#f5f3ff",
+          border: "1px solid #ddd6fe",
+          "& .MuiAlert-icon": { color: "#a78bfa" },
         }}
       >
         <Typography variant="body2">

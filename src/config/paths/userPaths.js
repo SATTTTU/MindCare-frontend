@@ -11,18 +11,42 @@ export const userPaths = {
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
-  login:{
+
+  homepage: {
+    path: "homepage",
+    getHref: (redirectTo) =>
+      `/user/homepage${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
+  },
+
+  login: {
     path: "login",
     getHref: (redirectTo) =>
       `/user/login${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
-  journel:{
+
+  journel: {
     path: "journel",
     getHref: (redirectTo) =>
       `/user/journel${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
-  }
+  },
+  privacy: {
+    path: "/register/policy",
+    getHref: (redirectTo) =>
+      `/user/policy${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
+  },
+  terms: {
+    path: "/register/terms",
+    getHref: (redirectTo) =>
+      `/user/terms${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
+  },
 };

@@ -140,11 +140,11 @@ export const RegisterForm = () => {
         label={
           <Typography variant="body2" color="text.secondary">
             I agree to the{" "}
-            <Link onClick={() => navigate("/terms")} sx={{ color: "#0e9300", cursor: "pointer", fontWeight: 500, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
+            <Link onClick={() => navigate("/register/terms")} sx={{ color: "#0e9300", cursor: "pointer", fontWeight: 500, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link onClick={() => navigate("/privacy")} sx={{ color: "#0e9300", cursor: "pointer", fontWeight: 500, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
+            <Link onClick={() => navigate("/register/policy")} sx={{ color: "#0e9300", cursor: "pointer", fontWeight: 500, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
               Privacy Policy
             </Link>
             . I understand that my data will be handled securely and confidentially.

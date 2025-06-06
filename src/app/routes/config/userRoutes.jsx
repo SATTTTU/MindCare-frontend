@@ -36,6 +36,33 @@ export const userRoutes = [
                   };
                 },
               },
+               {
+                path: paths.user.homepage.path,
+                lazy: async () => {
+                  const { HomePageRoute } = await import("../../routes/user/homepage/homepage");
+                  return {
+                    Component: HomePageRoute,
+                  };
+                },
+              },
+               {
+                path: paths.user.privacy.path,
+                lazy: async () => {
+                  const { PrivacyPolicy } = await import("../../../modules/user/privacy_terms/privacy");
+                  return {
+                    Component: PrivacyPolicy,
+                  };
+                },
+              },
+               {
+                path: paths.user.terms.path,
+                lazy: async () => {
+                  const { TermsOfService } = await import("../../../modules/user/privacy_terms/terms");
+                  return {
+                    Component: TermsOfService,
+                  };
+                },
+              },
             ],
     
   },
