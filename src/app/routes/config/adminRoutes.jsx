@@ -13,11 +13,11 @@ export const adminRoutes = [
         element: <AuthRoot />,
         children: [
           {
-            path: paths.user.register.path,
+            path: paths.admin.login.path,
             lazy: async () => {
-              const { RegisterRoute } = await import("../../routes/user/auth/register");
+              const { AdminLogin } = await import("../../../modules/admin/auth/components/login");
               return {
-                Component: RegisterRoute,
+                Component: AdminLogin,
               };
             },
           },

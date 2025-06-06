@@ -4,10 +4,10 @@ export const adminPaths = {
     getHref: () => "/",
   },
 
-  register: {
-    path: "/admin/register",
+  login: {
+    path: "/admin/login",
     getHref: (redirectTo) =>
-      `/admin/register${
+      `/admin/login${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
