@@ -13,7 +13,7 @@ export const userPaths = {
   },
 
   homepage: {
-    path: "homepage",
+    path: "/",
     getHref: (redirectTo) =>
       `/user/homepage${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
