@@ -1,4 +1,6 @@
-import { useState } from "react";
+// src/components/auth/LoginForm.jsx
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -14,7 +16,7 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff, Email, Lock, Info } from "@mui/icons-material";
 import { useUserLoginFormik } from "../formik/useUserloginformik";
-
+import { useAuth } from "@/context/AuthContext";
 const focusedStyles = {
   "& .MuiOutlinedInput-root": {
     "&.Mui-focused fieldset": { borderColor: "#a78bfa" },
@@ -23,18 +25,41 @@ const focusedStyles = {
 };
 
 export const LoginForm = () => {
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      // Redirect based on role, assuming AuthContext provides role-based paths
+      // Or redirect to a generic dashboard
+      navigate(user.role === 'Admin' ? '/admin-dashboard' : '/user-dashboard');
+    }
+  }, [user, navigate]);
+
 
   const { formik, isLoggingIn } = useUserLoginFormik({
     mutationConfig: {
-      onSuccess: () => {
-        setTimeout(() => navigate("/dashboard"), 2000);
-      },
+      // Correctly handle the successful login
+  onSuccess: (result) => {
+  console.log("✅ Login API result:", result);
+
+  if (!result || !result.token || !result.user) {
+    console.error("❌ Invalid login result structure:", result);
+    return;
+  }
+
+  // Pass the entire object to login
+  login({
+    token: result.token,
+    user: result.user,
+  });
+},
     },
   });
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const renderTextField = (name, label, type, placeholder, Icon) => (
     <TextField

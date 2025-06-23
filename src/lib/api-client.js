@@ -3,7 +3,7 @@ import Axios from "axios";
 const COOKIE_KEYS = {
   USER_TYPE: "user_type",
   ADMIN_TOKEN: "admin_token",
-  COOK_TOKEN: "cook_token",
+  COOK_TOKEN: "doctor_token",
   USER_TOKEN: "user_token",
   ACTIVE_USER: "active_user",
   AUTH_TOKEN: "authToken",

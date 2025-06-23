@@ -2,6 +2,7 @@ import { lazy } from "react";
 import { Outlet } from "react-router-dom";
 import { AppRootErrorBoundary, AuthRoot } from "../app/root";
 import { paths } from "@/config/paths";
+import ProtectedRoute from "./protectedRoutes";
 
 export const adminRoutes = [
   {
@@ -10,7 +11,7 @@ export const adminRoutes = [
     ErrorBoundary: AppRootErrorBoundary,
     children: [
       {
-        element: <AuthRoot />,
+        element: <ProtectedRoute allowedRoles={  ['Admin']} />,
         children: [
           {
             path: paths.admin.login.path,

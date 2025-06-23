@@ -1,9 +1,11 @@
+// src/formik/useUserLoginFormik.js
+
 import { useFormik } from "formik";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import { useUserLogin } from "../api/login";
 import { loginSchema } from "./schema/authSchema";
+import { useUserLogin } from "../api/login";
 
 export const useUserLoginFormik = (config = {}) => {
   const { mutateAsync, isLoading: isLoggingIn } = useUserLogin({
@@ -17,49 +19,41 @@ export const useUserLoginFormik = (config = {}) => {
     },
     validationSchema: toFormikValidationSchema(loginSchema),
     validateOnBlur: true,
-    validateOnChange: true, // <-- Change here: validate on change for better feedback
+    validateOnChange: true,
     onSubmit: async (values, helpers) => {
       try {
+        // This calls the login API and returns the user/token data
         const result = await mutateAsync(values);
         helpers.setStatus({ success: true, message: "Login successful" });
         helpers.resetForm();
 
         toast.success("✅ Login successful! Welcome back!", {
           position: "top-right",
-          autoClose: 3000,
+          autoClose: 2000, // Shortened for quicker navigation feel
         });
 
+        // This will call the onSuccess function provided by the LoginForm component
         if (config?.mutationConfig?.onSuccess) {
           config.mutationConfig.onSuccess(result);
         }
       } catch (err) {
         console.error("Login error:", err);
 
-        if (err instanceof AxiosError && err.response) {
-          const status = err.response?.status;
-          const message = err.response?.data?.message || "Login failed";
+        const errorMessage =
+          err instanceof AxiosError && err.response
+            ? err.response.data?.message || "An unexpected error occurred."
+            : "Network error. Please check your connection.";
+        
+        const errorStatus = err instanceof AxiosError ? err.response?.status : null;
 
-          if (status === 401) {
-            helpers.setErrors({ submit: "Invalid email or password." });
-            toast.error("❌ Invalid credentials. Please try again!", {
-              position: "top-right",
-              autoClose: 3000,
-            });
-          } else {
-            helpers.setErrors({ submit: message });
-            toast.error(`⚠️ ${message}`, {
-              position: "top-right",
-              autoClose: 3000,
-            });
-          }
+        if (errorStatus === 401) {
+          helpers.setErrors({ submit: "Invalid email or password." });
+          toast.error("❌ Invalid credentials. Please try again!", { position: "top-right" });
         } else {
-          helpers.setErrors({ submit: "Network error. Please try again later." });
-          toast.error("❌ Connection error. Check your internet!", {
-            position: "top-right",
-            autoClose: 4000,
-          });
+          helpers.setErrors({ submit: errorMessage });
+          toast.error(`⚠️ ${errorMessage}`, { position: "top-right" });
         }
-
+        
         if (config?.mutationConfig?.onError) {
           config.mutationConfig.onError(err);
         }

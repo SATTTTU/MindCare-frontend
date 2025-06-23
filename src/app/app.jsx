@@ -1,13 +1,18 @@
-import { AppProvider } from "./provider";
-import { AppRouter } from "./router";
-import { NotFoundPage } from "./routes/not-found";
+// src/app/layouts/RootLayout.jsx (Previously App.jsx, now a proper layout)
 
-export const App = () => {
-  return(
-    <AppProvider>
-      <AppRouter >
-      <NotFoundPage/>
-      </AppRouter>
-    </AppProvider>
+import { Outlet } from "react-router-dom";
+// import GlobalNavbar from "@/components/ui/GlobalNavbar"; // Example
+// import GlobalFooter from "@/components/ui/GlobalFooter"; // Example
+
+export const RootLayout = () => {
+  return (
+    <div className="app-container">
+      {/* <GlobalNavbar /> */}
+      <main>
+        {/* All your nested routes will be rendered here */}
+        <Outlet />
+      </main>
+      {/* <GlobalFooter /> */}
+    </div>
   );
-}
+};
