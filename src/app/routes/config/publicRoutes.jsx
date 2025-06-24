@@ -3,6 +3,15 @@
 import { paths } from "@/config/paths";
 
 export const publicRoutes = [
+   {
+          path: paths.user.homepage.path, // e.g., '/dashboard'
+          lazy: async () => {
+            const { HomePageRoute } = await import(
+              "../../routes/user/homepage/homepage"
+            );
+            return { Component: HomePageRoute };
+          },
+        },
   // These routes DO NOT have a <ProtectedRoute> wrapper.
   {
     path: paths.user.register.path,
