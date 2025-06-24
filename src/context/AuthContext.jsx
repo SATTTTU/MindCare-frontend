@@ -38,16 +38,22 @@ export const AuthProvider = ({ children }) => {
   }, [token, logout]);
 
   const login = (authData) => {
-    localStorage.setItem('token', authData.token);
-    setToken(authData.token);
-    setUser(authData.user);
+  const decoded = jwtDecode(authData.token);
+  localStorage.setItem('token', authData.token);
+  setToken(authData.token);
+  setUser({
+    id: decoded.userId,
+    email: decoded.email,
+    role: decoded.role || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
+  });
 
-    if (authData.user.role === 'Admin') {
-      navigate('/admin-dashboard');
-    } else {
-      navigate('/user-dashboard'); // Or a more generic user homepage path
-    }
-  };
+  if (decoded.role === 'Admin') {
+    navigate('/admin-dashboard');
+  } else {
+    navigate('/user-dashboard');
+  }
+};
+
 
   const value = { user, token, login, logout };
 
