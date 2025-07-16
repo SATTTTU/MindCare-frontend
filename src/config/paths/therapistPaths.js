@@ -4,8 +4,8 @@ export const therapistPaths = {
     getHref: () => "/therapist",
   },
 
-  register: {
-    path: "therapist/register",
+  be_therapist: {
+    path: "become-therapist",
     getHref: (redirectTo) =>
       `therapist/register${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""

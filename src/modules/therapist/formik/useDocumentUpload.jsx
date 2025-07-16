@@ -1,9 +1,8 @@
-// useCookDocumentFormik.js (Updated version of useDocumentUpload.js) 
-// This is a modified version of the code from your first document to ensure cook_id is correctly handled
+
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { toast } from "react-toastify";
-import { documentSchema } from "./schema/authschema";
+import { documentSchema } from "./schema/documentSchema";
 import { useCookRegister } from "../api/cookregister";
 
 export const useCookDocumentFormik = (config = {}) => {

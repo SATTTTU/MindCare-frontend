@@ -13,11 +13,10 @@ export const therapistRoutes = [
         element: <AuthRoot />,
         children: [
                   {
-                    path: paths.user.register.path,
+                    path: paths.therapists.be_therapist.path,
                     lazy: async () => {
-                      const { RegisterRoute } = await import("../../routes/user/auth/register");
-                      return {
-                        Component: RegisterRoute,
+                      const { MultiStepForm } = await import("../../../modules/therapist/components/MultiStepForm");                      return {
+                        Component: MultiStepForm,
                       };
                     },
                   },

@@ -1,16 +1,16 @@
 // MultiStepForm.jsx - Updated with cook_id handling
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useCookDocumentFormik } from "../formik/useDocumentUpload";
 import { ToastContainer } from "react-toastify";
 import Stepper from "./stepper";
-import { CitizenshipUploadStep } from "./citizenshipupload";
-import CertificatesStep from "./certificates";
-import TermsStep from "./termsandconditions";
 import { ChevronRight } from "lucide-react";
+import { useCookDocumentFormik } from "../formik/useDocumentUpload";
+import { CitizenshipUploadStep } from "./citizenshipUpload";
+import CertificatesStep from "./certificates";
+import TermsStep from "./termscond";
 
 // Main MultiStepForm Component
-const MultiStepForm = () => {
+ export const MultiStepForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
@@ -255,5 +255,3 @@ const MultiStepForm = () => {
 		</div>
 	);
 };
-
-export default MultiStepForm;
