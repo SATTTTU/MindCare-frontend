@@ -9,6 +9,15 @@ export const userRoutes = [
     // We allow both 'User' and 'Admin' to access these common user routes.
     element: <ProtectedRoute allowedRoles={['User', 'Admin']} />,
     children: [
+      {
+        path: paths.user.dashboard.path, // e.g., '/journal'
+        lazy: async () => {
+          const { UserDashboard } = await import(
+            "../../../modules/user/dashboard/components/dashboard"
+          );
+          return { Component: UserDashboard };
+        },
+      },
      
       {
         path: paths.user.journel.path, // e.g., '/journal'
@@ -19,7 +28,7 @@ export const userRoutes = [
           return { Component: JournalComponent };
         },
       },
-      // ... other protected user routes
+     
     ],
   },
 ];

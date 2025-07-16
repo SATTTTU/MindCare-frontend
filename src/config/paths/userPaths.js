@@ -49,4 +49,12 @@ export const userPaths = {
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
+   dashboard: {
+    path: "/user-dashboard",
+    getHref: (redirectTo) =>
+      `/user-dashboard${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
+  },
+
 };
