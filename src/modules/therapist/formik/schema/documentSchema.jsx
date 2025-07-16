@@ -1,3 +1,4 @@
+	import {z} from "zod";
 export const documentSchema = z.object({
 	passwordsizedphoto: z
 		.any()

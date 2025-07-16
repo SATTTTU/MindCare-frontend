@@ -10,16 +10,14 @@ import CertificatesStep from "./certificates";
 import TermsStep from "./termscond";
 
 // Main MultiStepForm Component
- export const MultiStepForm = () => {
+export const MultiStepForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [clientId, setClientId] = useState(null);
   const [userData, setUserData] = useState(null);
 
-  // Extract client ID and user data from localStorage, prioritize over URL/state
   useEffect(() => {
-    // First try to get userData from localStorage (contains id, name, email)
     const storedUserData = localStorage.getItem("userData");
     let userDataObj = null;
 
@@ -32,22 +30,16 @@ import TermsStep from "./termscond";
       }
     }
 
-    // Check specifically for cook_id which is required by the document upload form
-    const cookId = localStorage.getItem("cook_id");
-
-    // For backwards compatibility, also check other possible ID sources:
-    // 1. From cookClientId in localStorage (set by PreRegisterForm)
+    // Prioritize userId from localStorage after successful login
+    const loggedInUserId = localStorage.getItem("userId");
+    const cookId = localStorage.getItem("therapist_id ");
     const storedClientId = localStorage.getItem("cookClientId");
-
-    // 2. From URL search params
     const params = new URLSearchParams(location.search);
     const urlClientId = params.get("clientId");
-
-    // 3. From state if navigated programmatically
     const stateClientId = location.state?.clientId;
 
-    // Use ID from highest priority source
     const id =
+      loggedInUserId ||
       cookId ||
       storedClientId ||
       urlClientId ||
@@ -56,7 +48,6 @@ import TermsStep from "./termscond";
 
     if (id) {
       setClientId(id);
-      // Ensure it's stored as cook_id for the document form
       localStorage.setItem("cook_id", id);
       console.log("Using cook ID:", id);
     } else {
@@ -77,13 +68,10 @@ import TermsStep from "./termscond";
     },
 
     initialValues: {
-      // Add clientId to form data
       clientId: clientId,
-      // Other initial values...
     },
   });
 
-  // Update formik values when clientId changes
   useEffect(() => {
     if (clientId && formik.values.clientId !== clientId) {
       formik.setFieldValue("clientId", clientId);
@@ -93,7 +81,6 @@ import TermsStep from "./termscond";
   const validateStep = (step) => {
     switch (step) {
       case 1:
-        // Citizenship documents validation including passport-sized photo
         formik.setFieldTouched("passwordsizedphoto", true);
         formik.setFieldTouched("citizenshipFront", true);
         formik.setFieldTouched("citizenshipBack", true);
@@ -110,11 +97,9 @@ import TermsStep from "./termscond";
         );
 
       case 2:
-        // Certificates step validation - optional fields, so always allow proceeding
         return true;
 
       case 3:
-        // Terms acceptance validation
         formik.setFieldTouched("termsAccepted", true);
         formik.validateField("termsAccepted");
         return !formik.errors.termsAccepted && formik.values.termsAccepted;
