@@ -7,6 +7,7 @@ import { AppProvider } from "./app/provider"; // Your global provider (e.g., for
 import { createAppRouter } from "./app/router";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import "./index.css"; // Your global styles, including Tailwind CSS
 
 // Create the router instance
 const router = createAppRouter();
