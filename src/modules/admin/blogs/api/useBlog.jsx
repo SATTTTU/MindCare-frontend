@@ -16,10 +16,14 @@ export const useGetPosts = (options = {}) => {
 };
 
 // Create a new post
+// Find this file in your project (e.g., api.js, postService.js, etc.)
+
 const createPost = async (postData) => {
+  
   const response = await api.post('/api/Blog/posts', postData);
-  return response.data;
+  return response;
 };
+
 
 export const useCreatePost = () => {
   const queryClient = useQueryClient();

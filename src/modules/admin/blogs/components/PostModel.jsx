@@ -10,27 +10,34 @@ const PostModal = ({ isOpen, onClose, post, categories = [], onSubmit }) => {
   const initialValues = {
     title: post?.title || '',
     content: post?.content || '',
-    category: post?.category || (categories[0]?.name || ''),
-    tags: post?.tags || '',
-    featuredImage: null, // Always start with null for the file input
+    categoryId: post?.categoryId || (categories.length > 0 ? categories[0].id : ''),
+    tags: post?.tags?.join(', ') || '', // Ensure tags are a string for the input
+    featuredImage: null,
   };
 
   const handleSubmit = (values) => {
-    // Construct form data for file uploads
     const formData = new FormData();
-    Object.keys(values).forEach(key => {
-      if (key === 'featuredImage' && values.featuredImage) {
-        formData.append(key, values.featuredImage);
-      } else {
-        formData.append(key, values[key]);
-      }
-    });
+
+    // Manually append each field with the correct PascalCase key
+    formData.append('Title', values.title);
+    formData.append('Content', values.content);
+    formData.append('CategoryId', values.categoryId);
+    formData.append('Tags', values.tags);
+
+    if (values.featuredImage) {
+      formData.append('FeaturedImageFile', values.featuredImage);
+    }
 
     if (isEditing) {
-      formData.append('id', post.id);
+      formData.append('Id', post.id);
     }
     
-    onSubmit(formData); // Send formData to the mutation
+    console.log("Submitting FormData. Verify these keys are PascalCase:");
+    for (let [key, value] of formData.entries()) {
+        console.log(`Key: ${key}, Value:`, value);
+    }
+
+    onSubmit(formData);
   };
 
   const formik = usePostForm(initialValues, handleSubmit);
@@ -68,12 +75,17 @@ const PostModal = ({ isOpen, onClose, post, categories = [], onSubmit }) => {
 
           {/* Category */}
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-            <select id="category" name="category" {...formik.getFieldProps('category')} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <select
+              id="categoryId"
+              name="categoryId"
+              {...formik.getFieldProps('categoryId')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
               <option value="">Select a category</option>
-              {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+              {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
             </select>
-            {formik.touched.category && formik.errors.category ? <p className="text-red-500 text-sm mt-1">{formik.errors.category}</p> : null}
+            {formik.touched.categoryId && formik.errors.categoryId ? <p className="text-red-500 text-sm mt-1">{formik.errors.categoryId}</p> : null}
           </div>
 
           {/* Tags */}

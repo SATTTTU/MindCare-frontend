@@ -93,28 +93,29 @@ const CategoryManager = ({ posts = [], categories = [] }) => {
       <div className="space-y-3">
         {categories.map(category => (
           <div key={category.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-            {editingCategory?.id === category.id ? (
-              <form onSubmit={editCategoryForm.handleSubmit} className="flex-1 flex items-center space-x-2">
-                <input
-                  name="name"
-                  type="text"
-                  {...editCategoryForm.getFieldProps('name')}
-                  className="flex-1 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  autoFocus
-                />
-                <button type="submit" disabled={editCategoryForm.isSubmitting} className="text-green-600 hover:text-green-800 p-1"><Save className="w-4 h-4" /></button>
-                <button type="button" onClick={handleCancelEdit} className="text-gray-600 hover:text-gray-800 p-1"><X className="w-4 h-4" /></button>
-              </form>
-            ) : (
-              <>
-                <span className="font-medium text-gray-900">{category.name}</span>
-                <div className="flex space-x-2">
-                  <button onClick={() => handleEditClick(category)} className="text-blue-600 hover:text-blue-800 p-1"><Edit2 className="w-4 h-4" /></button>
-                  <button onClick={() => handleDeleteClick(category)} disabled={category.name === 'Uncategorized'} className="text-red-600 hover:text-red-800 p-1 disabled:text-gray-300 disabled:cursor-not-allowed"><Trash2 className="w-4 h-4" /></button>
-                </div>
-              </>
-            )}
-          </div>
+  {editingCategory?.id === category.id ? (
+    <form onSubmit={editCategoryForm.handleSubmit} className="flex-1 flex items-center space-x-2">
+      <input
+        name="name"
+        type="text"
+        {...editCategoryForm.getFieldProps('name')}
+        className="flex-1 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        autoFocus
+      />
+      <button type="submit" disabled={editCategoryForm.isSubmitting} className="text-green-600 hover:text-green-800 p-1"><Save className="w-4 h-4" /></button>
+      <button type="button" onClick={handleCancelEdit} className="text-gray-600 hover:text-gray-800 p-1"><X className="w-4 h-4" /></button>
+    </form>
+  ) : (
+    <div className="flex-1 flex items-center justify-between">
+      <span className="font-medium text-gray-900">{category.name}</span>
+      <div className="flex space-x-2">
+        <button onClick={() => handleEditClick(category)} className="text-blue-600 hover:text-blue-800 p-1"><Edit2 className="w-4 h-4" /></button>
+        <button onClick={() => handleDeleteClick(category)} disabled={category.name === 'Uncategorized'} className="text-red-600 hover:text-red-800 p-1 disabled:text-gray-300 disabled:cursor-not-allowed"><Trash2 className="w-4 h-4" /></button>
+      </div>
+    </div>
+  )}
+</div>
+
         ))}
       </div>
 
