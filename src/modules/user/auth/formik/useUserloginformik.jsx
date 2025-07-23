@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { loginSchema } from "./schema/authSchema";
 import { useUserLogin } from "../api/login";
+import { saveUserData } from "@/lib/api-client";
 
 export const useUserLoginFormik = (config = {}) => {
   const { mutateAsync, isLoading: isLoggingIn } = useUserLogin({
@@ -31,9 +32,10 @@ export const useUserLoginFormik = (config = {}) => {
         });
 
         // Store the user's ID in localStorage
-        if (result && result.user && result.user.id) {
-          localStorage.setItem("userId", result.user.id);
-        }
+      if (result && result.user && result.token) {
+  localStorage.setItem("userId", result.user.id);
+   saveUserData(result.user.role.toLowerCase(), result.token);
+}
 
         if (config?.mutationConfig?.onSuccess) {
           config.mutationConfig.onSuccess(result);

@@ -12,4 +12,12 @@ export const adminPaths = {
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
+   users: {
+    path: "/get-users",
+    getHref: (redirectTo) =>
+      `/get-users${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
+  },
 };
+

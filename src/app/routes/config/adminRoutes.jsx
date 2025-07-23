@@ -22,6 +22,15 @@ export const adminRoutes = [
               };
             },
           },
+           {
+            path: paths.admin.users.path,
+            lazy: async () => {
+              const { DisplayUserRoute } = await import("../../../modules/admin/users/components/users");
+              return {
+                Component: DisplayUserRoute,
+              };
+            },
+          },
         ],
       },
     ],

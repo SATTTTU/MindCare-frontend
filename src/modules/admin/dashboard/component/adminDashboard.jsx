@@ -3,6 +3,7 @@ import { IoIosNotifications, IoMdSearch } from "react-icons/io";
 import { FaUsers, FaUserMd, FaChartLine, FaExclamationTriangle, FaCalendarAlt, FaFlag, FaUserCheck } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
 import { AdminProfileCard } from "./profilecard";
+import { AdminSidebar } from "./adminSidebar";
 
 // Custom hook to detect clicks outside a specified element
 const useOutsideClick = (ref, callback) => {
@@ -23,41 +24,7 @@ const useOutsideClick = (ref, callback) => {
   }, [handleClick]);
 };
 
-// Profile Card Component for Admin
 
-
-// Sidebar Component for Admin
-const AdminSidebar = () => {
-  return (
-    <div className="w-64 bg-white shadow-sm border-r border-gray-200 h-full">
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-bold text-indigo-600">MindCare Admin</h2>
-      </div>
-      <nav className="p-4 space-y-2">
-        <a href="#" className="flex items-center px-4 py-3 text-indigo-600 bg-indigo-50 rounded-lg">
-          <FaChartLine className="mr-3" />
-          Dashboard
-        </a>
-        <a href="#" className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-          <FaUsers className="mr-3" />
-          User Management
-        </a>
-        <a href="#" className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-          <FaUserMd className="mr-3" />
-          Therapist Management
-        </a>
-        <a href="#" className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-          <FaCalendarAlt className="mr-3" />
-          Appointments
-        </a>
-        <a href="#" className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-          <FaFlag className="mr-3" />
-          Reports & Alerts
-        </a>
-      </nav>
-    </div>
-  );
-};
 
 // A modern, themed stats card with skeleton loading
 const AdminStatsCard = ({ icon, title, value, trend, delay, isLoading, status = "normal" }) => {
@@ -298,12 +265,7 @@ export const AdminDashboard = React.memo(() => {
     }
   ];
 
-  const notifications = [
-    { id: 1, message: "3 new therapist applications pending review." },
-    { id: 2, message: "Monthly system report is ready for download." },
-    { id: 3, message: "Crisis intervention protocol activated for User #1247." },
-    { id: 4, message: "Server maintenance scheduled for Sunday 2:00 AM." }
-  ];
+ 
 
   const toggleProfile = useCallback(() => setShowProfile((p) => !p), []);
   const toggleNotifications = useCallback(() => setShowNotifications((p) => !p), []);
