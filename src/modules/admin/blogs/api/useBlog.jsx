@@ -3,7 +3,7 @@ import { api } from '@/lib/api-client'; // Assuming your API client is here
 
 // Fetch all posts
 const getPosts = async () => {
-  const response = await api.get('/api/Blog/posts/search');
+  const response = await api.get('/api/Blog/all');
   return response;
 };
 
