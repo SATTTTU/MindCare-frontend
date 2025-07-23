@@ -122,6 +122,7 @@ const Header = () => {
           </List>
           <Divider />
           <Box sx={{ px: 2, py: 2 }}>
+            <Link to="/login" style={{ textDecoration: 'none' }}>
             <Button
               variant="outlined"
               fullWidth
@@ -135,6 +136,7 @@ const Header = () => {
             >
               Sign In
             </Button>
+            </Link>
             <Button
               variant="contained"
               fullWidth

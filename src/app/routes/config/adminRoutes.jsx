@@ -14,11 +14,11 @@ export const adminRoutes = [
         element: <ProtectedRoute allowedRoles={  ['Admin']} />,
         children: [
           {
-            path: paths.admin.login.path,
+            path: paths.admin.dashboard.path,
             lazy: async () => {
-              const { AdminLogin } = await import("../../../modules/admin/auth/components/login");
+              const { AdminDashboard } = await import("../../../modules/admin/dashboard/component/adminDashboard");
               return {
-                Component: AdminLogin,
+                Component: AdminDashboard,
               };
             },
           },

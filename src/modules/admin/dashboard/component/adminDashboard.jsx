@@ -16,7 +16,6 @@ const useOutsideClick = (ref, callback) => {
     },
     [ref, callback]
   );
-  
 
   React.useEffect(() => {
     document.addEventListener("mousedown", handleClick);
@@ -96,7 +95,7 @@ const RecentActivityList = ({ activities, isLoading }) => {
     );
 };
 
-export const AdninDashboard = React.memo(() => {
+export const AdminDashboard = React.memo(() => {
   const [showProfile, setShowProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const profileRef = useRef(null);

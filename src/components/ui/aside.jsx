@@ -16,6 +16,7 @@ export const Sidebar = () => {
 
   const menuItems = [
     { to: "/user-dashboard", icon: <MdDashboard />, text: "Dashboard" },
+    {to:"/journel", icon: <CiUser />, text: "Journel" },
     { to: "/appointments", icon: <CiUser />, text: "Appointments " },
     { to: "/mood-tracking", icon: <FaCookie />, text: "Mood Tracking " },
     { to: "/activities", icon: <MdPayments />, text: "Wellness Activities " },
