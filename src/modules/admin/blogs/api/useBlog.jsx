@@ -1,0 +1,66 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api-client'; // Assuming your API client is here
+
+// Fetch all posts
+const getPosts = async () => {
+  const response = await api.get('/api/posts');
+  return response.data;
+};
+
+export const useGetPosts = (options = {}) => {
+  return useQuery({
+    queryKey: ['posts'],
+    queryFn: getPosts,
+    ...options
+  });
+};
+
+// Create a new post
+const createPost = async (postData) => {
+  const response = await api.post('/api/posts', postData);
+  return response.data;
+};
+
+export const useCreatePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createPost,
+    onSuccess: () => {
+      // Invalidate and refetch the posts query to show the new post
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    }
+  });
+};
+
+// Update an existing post
+const updatePost = async (postData) => {
+  const { id, ...data } = postData;
+  const response = await api.put(`/api/posts/${id}`, data);
+  return response.data;
+};
+
+export const useUpdatePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updatePost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    }
+  });
+};
+
+// Delete a post
+const deletePost = async (postId) => {
+  const response = await api.delete(`/api/posts/${postId}`);
+  return response.data;
+};
+
+export const useDeletePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deletePost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    }
+  });
+};

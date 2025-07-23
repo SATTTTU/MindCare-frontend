@@ -6,6 +6,7 @@ import {
   FaChartLine,
   FaCalendarAlt,
   FaFlag,
+  FaBlog,
 } from "react-icons/fa";
 
 export const AdminSidebar = () => {
@@ -44,11 +45,11 @@ export const AdminSidebar = () => {
           Appointments
         </Link>
         <Link
-          to="/admin/reports"
+          to="/blogs"
           className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg"
         >
-          <FaFlag className="mr-3" />
-          Reports & Alerts
+          <FaBlog className="mr-3" />
+          Blogs
         </Link>
       </nav>
     </div>

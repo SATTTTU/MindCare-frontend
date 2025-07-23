@@ -31,6 +31,15 @@ export const adminRoutes = [
               };
             },
           },
+           {
+            path: paths.admin.blogs.path,
+            lazy: async () => {
+              const { BlogManagement } = await import("../../../modules/admin/blogs/components/BlogManagement");
+              return {
+                Component: BlogManagement,
+              };
+            },
+          },
         ],
       },
     ],
