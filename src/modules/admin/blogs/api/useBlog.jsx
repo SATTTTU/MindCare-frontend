@@ -3,8 +3,8 @@ import { api } from '@/lib/api-client'; // Assuming your API client is here
 
 // Fetch all posts
 const getPosts = async () => {
-  const response = await api.get('/api/posts');
-  return response.data;
+  const response = await api.get('/api/Blog/posts/search');
+  return response;
 };
 
 export const useGetPosts = (options = {}) => {
@@ -17,7 +17,7 @@ export const useGetPosts = (options = {}) => {
 
 // Create a new post
 const createPost = async (postData) => {
-  const response = await api.post('/api/posts', postData);
+  const response = await api.post('/api/Blog/posts', postData);
   return response.data;
 };
 
@@ -35,7 +35,7 @@ export const useCreatePost = () => {
 // Update an existing post
 const updatePost = async (postData) => {
   const { id, ...data } = postData;
-  const response = await api.put(`/api/posts/${id}`, data);
+  const response = await api.put(`/api/Blog/posts/${id}`, data);
   return response.data;
 };
 

@@ -3,8 +3,8 @@ import { api } from '@/lib/api-client';
 
 // Fetch all categories (adapted from your useCategory hook)
 const getCategories = async () => {
-  const response = await api.get('/api/categories');
-  return response.data;
+  const response = await api.get('/api/Blog/categories');
+  return response;
 };
 
 export const useGetCategories = (options = {}) => {
@@ -35,7 +35,7 @@ export const useCreateCategory = () => {
 // Update an existing category
 const updateCategory = async (categoryData) => {
   const { id, ...data } = categoryData;
-  const response = await api.put(`/api/categories/${id}`, data);
+  const response = await api.put(`/api/Blog/categories/${id}`, data);
   return response.data;
 };
 
