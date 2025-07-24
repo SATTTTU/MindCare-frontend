@@ -86,12 +86,74 @@ import DeleteConfirmationModal from './DeleteConfirmModel';
               </button>
             </div>
             <div className="space-y-4">
-              {posts?.map(post => (
-                <div key={post.id} className="border border-gray-200 rounded-lg p-4">
-                  {/* ... Post display JSX ... */}
-                </div>
-              ))}
-            </div>
+  {posts?.map(post => (
+    <div key={post.id} className="border border-gray-200 rounded-lg p-4 shadow-sm">
+      {/* Featured Image */}
+     {post.featuredImage?.trim() && (
+  <img
+    src={
+      post.featuredImage.startsWith('/')
+        ? `http://localhost:3000${post.featuredImage}`
+        : post.featuredImage
+    }
+    alt={post.title}
+    className="w-full h-48 object-cover rounded-md mb-4"
+  />
+)}
+
+      {/* Title */}
+      <h2 className="text-xl font-semibold text-gray-800">{post.title}</h2>
+
+      {/* Summary (if not null) */}
+      {post.summary && (
+        <p className="text-gray-600 mt-2">{post.summary}</p>
+      )}
+
+      {/* Category, Author, Tags */}
+      <div className="text-sm text-gray-500 mt-2 space-x-2">
+        <span>Category: <strong>{post.categoryName}</strong></span>
+        <span>Author: <strong>{post.authorName}</strong></span>
+      </div>
+
+      {/* Tags */}
+      {post.tags?.length > 0 && (
+        <div className="mt-2">
+          <span className="font-medium text-gray-700">Tags:</span>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {post.tags.map((tag, index) => (
+              <span
+                key={index}
+                className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Published At */}
+      <div className="text-sm text-gray-400 mt-2">
+        {post.publishedAt ? (
+          <span>Published on: {new Date(post.publishedAt).toLocaleDateString()}</span>
+        ) : (
+          <span className="italic">Not published yet</span>
+        )}
+      </div>
+
+      {/* Views and Featured */}
+      <div className="text-sm text-gray-500 mt-2">
+        <span>Views: {post.viewCount}</span>
+        {post.isFeatured && (
+          <span className="ml-4 px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs font-semibold">
+            Featured
+          </span>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
+
           </div>
 
           {/* Manage Categories Section */}
