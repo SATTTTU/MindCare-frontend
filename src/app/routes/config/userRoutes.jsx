@@ -10,7 +10,7 @@ export const userRoutes = [
     element: <ProtectedRoute allowedRoles={['User', 'Admin']} />,
     children: [
       {
-        path: paths.user.dashboard.path, // e.g., '/journal'
+        path: paths.user.dashboard.path, 
         lazy: async () => {
           const { UserDashboard } = await import(
             "../../../modules/user/dashboard/components/dashboard"

@@ -1,18 +1,8 @@
+import { Sidebar } from "@/components/ui/aside";
 import { useJournalFormik } from "../formik/useJournelFormik";
 
 export const JournalComponent = () => {
   const formik = useJournalFormik();
-
-  const moods = [
-    { emoji: '😊', label: 'happy', color: '#FFF3E0' },
-    { emoji: '😌', label: 'calm', color: '#E3F2FD' },
-    { emoji: '😐', label: 'neutral', color: '#F5F5F5' },
-    { emoji: '😢', label: 'sad', color: '#E1F5FE' },
-    { emoji: '😠', label: 'angry', color: '#FFEBEE' },
-    { emoji: '😰', label: 'anxious', color: '#F3E5F5' },
-    { emoji: '😴', label: 'tired', color: '#E8EAF6' },
-    { emoji: '🤗', label: 'grateful', color: '#FCE4EC' }
-  ];
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -24,295 +14,144 @@ export const JournalComponent = () => {
     });
   };
 
-  const styles = {
-    container: {
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-      padding: '24px 16px',
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
-    },
-    mainCard: {
-      maxWidth: '800px',
-      margin: '0 auto',
-      backgroundColor: '#ffffff',
-      borderRadius: '16px',
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-      padding: '32px',
-      marginBottom: '24px'
-    },
-    header: {
-      textAlign: 'center',
-      marginBottom: '48px'
-    },
-    headerIcon: {
-      width: '64px',
-      height: '64px',
-      borderRadius: '50%',
-      background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      margin: '0 auto 24px',
-      boxShadow: '0 4px 16px rgba(33, 150, 243, 0.3)'
-    },
-    title: {
-      fontSize: '2.5rem',
-      fontWeight: '300',
-      color: '#424242',
-      marginBottom: '8px',
-      lineHeight: '1.2'
-    },
-    subtitle: {
-      fontSize: '1.125rem',
-      color: '#757575',
-      fontWeight: '400'
-    },
-    sectionTitle: {
-      fontSize: '1.25rem',
-      fontWeight: '500',
-      color: '#424242',
-      marginBottom: '16px'
-    },
-    moodGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
-      gap: '12px',
-      marginBottom: '24px'
-    },
-    moodButton: {
-      border: 'none',
-      borderRadius: '12px',
-      padding: '16px 8px',
-      textAlign: 'center',
-      cursor: 'pointer',
-      transition: 'all 0.2s ease-in-out',
-      position: 'relative',
-      outline: 'none',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-    },
-    moodEmoji: {
-      fontSize: '2rem',
-      marginBottom: '8px',
-      display: 'block'
-    },
-    moodLabel: {
-      fontSize: '0.875rem',
-      fontWeight: '500',
-      color: '#424242'
-    },
-    inputField: {
-      width: '100%',
-      padding: '12px 16px',
-      border: '2px solid #E0E0E0',
-      borderRadius: '8px',
-      fontSize: '1rem',
-      fontFamily: 'inherit',
-      outline: 'none',
-      transition: 'border-color 0.2s ease-in-out',
-      marginBottom: '16px'
-    },
-    textarea: {
-      width: '100%',
-      minHeight: '200px',
-      padding: '16px',
-      border: '2px solid #E0E0E0',
-      borderRadius: '8px',
-      fontSize: '1rem',
-      fontFamily: 'inherit',
-      resize: 'vertical',
-      outline: 'none',
-      transition: 'border-color 0.2s ease-in-out',
-      lineHeight: '1.5'
-    },
-    saveButton: {
-      backgroundColor: '#2196F3',
-      color: 'white',
-      border: 'none',
-      borderRadius: '24px',
-      padding: '12px 32px',
-      fontSize: '1rem',
-      fontWeight: '500',
-      cursor: 'pointer',
-      transition: 'all 0.2s ease-in-out',
-      boxShadow: '0 4px 16px rgba(33, 150, 243, 0.3)',
-      outline: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      margin: '0 auto'
-    },
-    saveButtonDisabled: {
-      backgroundColor: '#BDBDBD',
-      cursor: 'not-allowed',
-      boxShadow: 'none'
-    },
-    errorText: {
-      color: '#f44336',
-      fontSize: '0.875rem',
-      marginTop: '4px',
-      marginBottom: '16px'
-    },
-    successText: {
-      color: '#4CAF50',
-      fontSize: '0.875rem',
-      textAlign: 'center',
-      marginBottom: '16px'
-    },
-    characterCount: {
-      textAlign: 'right', 
-      fontSize: '0.875rem', 
-      color: '#757575', 
-      marginTop: '8px'
-    }
+  const getCurrentTime = () => {
+    const now = new Date();
+    return now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
-    <div style={styles.container}>
-      <style>
-        {`
+    <div className="flex min-h-screen font-inter">
+      <div className="flex min-h-screen bg-slate-50 font-sans">
+    <Sidebar />
+      </div>
+      <div className="flex-grow p-5 flex items-center justify-center">
+        <style jsx>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+          @keyframes pulse-custom {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+          }
+          @keyframes float-in {
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
           }
-          @media (max-width: 768px) {
-            .mood-grid {
-              grid-template-columns: repeat(4, 1fr);
-            }
-            .title {
-              font-size: 2rem !important;
-            }
-            .main-card {
-              padding: 24px !important;
-            }
+          .animate-spin-custom {
+            animation: spin 1s linear infinite;
           }
-        `}
-      </style>
+          .animate-pulse-custom {
+            animation: pulse-custom 2s ease-in-out infinite;
+          }
+          .animate-float-in {
+            animation: float-in 0.3s ease-out;
+          }
+          .glass-morphism {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+          }
+        `}</style>
 
-      <div style={styles.mainCard} className="main-card">
-        <div style={styles.header}>
-          <div style={styles.headerIcon}>
-            <span style={{ fontSize: '1.5rem', color: 'white' }}>✨</span>
+        <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-8 md:p-12 relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-emerald-50 to-green-100 rounded-full transform translate-x-16 -translate-y-16 opacity-60"></div>
+
+          {/* Header */}
+          <div className="text-center mb-10 relative z-10">
+            <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg animate-pulse-custom">
+              <span className="text-3xl">✍️</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-3 leading-tight">
+              Today's Journal
+            </h1>
+            <p className="text-lg text-slate-600 font-medium mb-2">
+              {getCurrentDate()}
+            </p>
+            <p className="text-base text-slate-400">
+              {getCurrentTime()}
+            </p>
           </div>
-          <h1 style={styles.title} className="title">
-            How are you feeling today?
-          </h1>
-          <p style={styles.subtitle}>
-            {getCurrentDate()}
-          </p>
+
+          {/* Status Messages */}
+          {formik.status?.error && (
+            <div className="text-red-500 text-sm text-center mb-4 font-medium">
+              {formik.status.message}
+            </div>
+          )}
+
+          {formik.status?.success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 text-base text-center mb-6 font-semibold p-3 rounded-xl animate-float-in">
+              ✨ {formik.status.message}
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={formik.handleSubmit} className="relative z-10">
+            <div className="relative mb-6">
+              {/* Floating Label */}
+              <div className={`absolute -top-3 left-5 bg-white px-2 text-sm font-semibold text-emerald-600 transition-all duration-300 ${
+                formik.values.text ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-2'
+              }`}>
+                Your thoughts
+              </div>
+
+              {/* Textarea */}
+              <textarea
+                name="text"
+                value={formik.values.text}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="What's on your mind today? How was your day? What are you grateful for? Let your thoughts flow freely..."
+                className={`w-full min-h-80 p-6 border-2 rounded-2xl text-lg font-normal resize-none outline-none transition-all duration-300 leading-relaxed bg-slate-50 shadow-inner ${
+                  formik.errors.text
+                    ? 'border-red-400 focus:border-red-500'
+                    : formik.values.text
+                      ? 'border-emerald-400 focus:border-emerald-500 bg-white shadow-lg transform -translate-y-1 focus:shadow-xl focus:ring-4 focus:ring-emerald-100'
+                      : 'border-slate-200 focus:border-emerald-400 focus:bg-white focus:shadow-lg focus:transform focus:-translate-y-1 focus:ring-4 focus:ring-emerald-100'
+                }`}
+              />
+
+              {/* Character Count */}
+              <div className="absolute bottom-3 right-5 text-sm text-slate-400 font-medium bg-white bg-opacity-90 px-2 py-1 rounded-lg glass-morphism">
+                {formik.values.text.length} characters
+              </div>
+
+              {/* Error Message */}
+              {formik.errors.text && formik.touched.text && (
+                <div className="text-red-500 text-sm mt-2 text-center font-medium">
+                  {formik.errors.text}
+                </div>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={formik.isSubmitting || !formik.values.text.trim()}
+              className={`w-full sm:w-auto mx-auto flex items-center justify-center px-10 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 min-w-48 relative overflow-hidden ${
+                formik.isSubmitting || !formik.values.text.trim()
+                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg hover:shadow-xl hover:transform hover:-translate-y-1 hover:from-emerald-600 hover:to-teal-700 active:transform active:translate-y-0'
+              }`}
+            >
+              {formik.isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin-custom mr-3"></div>
+                  Saving your thoughts...
+                </>
+              ) : (
+                <>
+                  <span className="mr-2">💾</span>
+                  Save Journal Entry
+                </>
+              )}
+            </button>
+          </form>
         </div>
-
-        {formik.status?.error && (
-          <div style={styles.errorText}>
-            {formik.status.message}
-          </div>
-        )}
-
-        {formik.status?.success && (
-          <div style={styles.successText}>
-            {formik.status.message}
-          </div>
-        )}
-
-        <form onSubmit={formik.handleSubmit}>
-          <div>
-            <h2 style={styles.sectionTitle}>Title</h2>
-            <input
-              type="text"
-              name="title"
-              value={formik.values.title}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Give your journal entry a title"
-              style={{
-                ...styles.inputField,
-                borderColor: formik.errors.title ? '#f44336' : 
-                            formik.values.title ? '#2196F3' : '#E0E0E0'
-              }}
-            />
-            {formik.errors.title && formik.touched.title && (
-              <div style={styles.errorText}>{formik.errors.title}</div>
-            )}
-          </div>
-
-          <div>
-            <h2 style={styles.sectionTitle}>Select your mood</h2>
-            <div style={styles.moodGrid} className="mood-grid">
-              {moods.map((mood, index) => (
-                <button
-                  type="button"
-                  key={index}
-                  onClick={() => formik.setFieldValue('mood', mood.label)}
-                  style={{
-                    ...styles.moodButton,
-                    backgroundColor: mood.color,
-                    transform: formik.values.mood === mood.label ? 'translateY(-2px) scale(1.05)' : 'none',
-                    boxShadow: formik.values.mood === mood.label 
-                      ? '0 4px 16px rgba(33, 150, 243, 0.3), 0 0 0 2px #2196F3' 
-                      : '0 2px 8px rgba(0, 0, 0, 0.1)'
-                  }}
-                >
-                  <span style={styles.moodEmoji}>{mood.emoji}</span>
-                  <div style={styles.moodLabel}>{mood.label.charAt(0).toUpperCase() + mood.label.slice(1)}</div>
-                </button>
-              ))}
-            </div>
-            {formik.errors.mood && formik.touched.mood && (
-              <div style={styles.errorText}>{formik.errors.mood}</div>
-            )}
-          </div>
-
-          <div>
-            <h2 style={styles.sectionTitle}>Share your thoughts</h2>
-            <textarea
-              name="text"
-              value={formik.values.text}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="What's on your mind today? How was your day? What are you grateful for? Write freely..."
-              style={{
-                ...styles.textarea,
-                borderColor: formik.errors.text ? '#f44336' : 
-                            formik.values.text ? '#2196F3' : '#E0E0E0'
-              }}
-            />
-            <div style={styles.characterCount}>
-              {formik.values.text.length} characters
-            </div>
-            {formik.errors.text && formik.touched.text && (
-              <div style={styles.errorText}>{formik.errors.text}</div>
-            )}
-          </div>
-
-<button
-  type="submit"
-  disabled={formik.isSubmitting}
-  style={{
-    ...styles.saveButton,
-    ...(formik.isSubmitting ? styles.saveButtonDisabled : {}),
-  }}
->
-  {formik.isSubmitting ? (
-    <>
-      <div style={{
-        width: '20px',
-        height: '20px',
-        border: '2px solid transparent',
-        borderTop: '2px solid white',
-        borderRadius: '50%',
-        animation: 'spin 1s linear infinite',
-        marginRight: '8px'
-      }}></div>
-      Saving...
-    </>
-  ) : (
-    'Save Entry'
-  )}
-</button>
-        </form>
       </div>
     </div>
   );

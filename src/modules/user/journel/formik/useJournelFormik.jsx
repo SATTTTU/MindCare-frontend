@@ -8,9 +8,7 @@ export const useJournalFormik = () => {
 
   const formik = useFormik({
     initialValues: {
-      title: "",
       text: "",
-      mood: "",
       date: new Date().toISOString().split("T")[0],
     },
     validationSchema: toFormikValidationSchema(journalValidationSchema),
@@ -19,16 +17,16 @@ export const useJournalFormik = () => {
     onSubmit: async (values, { setStatus, setSubmitting, resetForm }) => {
       try {
         await mutateAsync(values);
-        setStatus({ 
-          success: true, 
-          message: "Journal saved successfully!",
+        setStatus({
+          success: true,
+          message: "Your journal entry has been saved successfully!",
           error: null
         });
         resetForm();
       } catch (error) {
-        setStatus({ 
-          error: true, 
-          message: error.message || "Failed to save journal. Please try again.",
+        setStatus({
+          error: true,
+          message: error.message || "Something went wrong. Please try again.",
           success: false
         });
       } finally {

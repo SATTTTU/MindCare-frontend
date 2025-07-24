@@ -96,7 +96,7 @@ const RecentActivityList = ({ activities, isLoading }) => {
     );
 };
 
-export const AdninDashboard = React.memo(() => {
+export const UserDashboard = React.memo(() => {
   const [showProfile, setShowProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const profileRef = useRef(null);

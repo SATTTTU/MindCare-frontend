@@ -5,6 +5,7 @@ import { useGetCategories } from '../api/useCateogry';
 import PostModal from './PostModel';
 import CategoryManager from './categoryManagemanager';
 import DeleteConfirmationModal from './DeleteConfirmModel';
+import { useNavigate } from 'react-router-dom';
 
 export const BlogManagement = () => {
   const [showPostModal, setShowPostModal] = useState(false);
@@ -20,8 +21,11 @@ export const BlogManagement = () => {
   const createPostMutation = useCreatePost();
   const updatePostMutation = useUpdatePost();
   const deletePostMutation = useDeletePost();
+  const navigate =useNavigate();
 
-  const handleBack = () => alert('Navigate back to dashboard');
+  const handleBack = () => {
+    navigate('/admin-dashboard')
+  };
 
   // Post management
   const openPostModal = (post = null) => {
