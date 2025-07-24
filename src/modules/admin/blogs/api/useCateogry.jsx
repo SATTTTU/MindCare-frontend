@@ -18,8 +18,8 @@ export const useGetCategories = (options = {}) => {
 
 // Create a new category
 const createCategory = async (categoryData) => {
-  const response = await api.post('/api/categories', categoryData);
-  return response.data;
+  const response = await api.post('/api/Blog/categories', categoryData);
+  return response;
 };
 
 export const useCreateCategory = () => {
@@ -51,7 +51,7 @@ export const useUpdateCategory = () => {
 
 // Delete a category
 const deleteCategory = async (categoryId) => {
-  const response = await api.delete(`/api/categories/${categoryId}`);
+  const response = await api.delete(`/api/Blog/categories/${categoryId}`);
   return response.data;
 };
 
