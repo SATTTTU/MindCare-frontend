@@ -40,7 +40,7 @@ export const useCreatePost = () => {
 const updatePost = async (postData) => {
   const { id, ...data } = postData;
   const response = await api.put(`/api/Blog/posts/${id}`, data);
-  return response.data;
+  return response;
 };
 
 export const useUpdatePost = () => {
@@ -55,8 +55,8 @@ export const useUpdatePost = () => {
 
 // Delete a post
 const deletePost = async (postId) => {
-  const response = await api.delete(`/api/posts/${postId}`);
-  return response.data;
+  const response = await api.delete(`/api/Blog/posts/${postId}`);
+  return response;
 };
 
 export const useDeletePost = () => {

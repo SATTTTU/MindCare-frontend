@@ -6,7 +6,7 @@ import PostModal from './PostModel';
 import CategoryManager from './categoryManagemanager';
 import DeleteConfirmationModal from './DeleteConfirmModel';
 
- export const BlogManagement = () => {
+export const BlogManagement = () => {
   const [showPostModal, setShowPostModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
@@ -86,74 +86,93 @@ import DeleteConfirmationModal from './DeleteConfirmModel';
               </button>
             </div>
             <div className="space-y-4">
-  {posts?.map(post => (
-    <div key={post.id} className="border border-gray-200 rounded-lg p-4 shadow-sm">
-      {/* Featured Image */}
-     {post.featuredImage?.trim() && (
-  <img
-    src={
-      post.featuredImage.startsWith('/')
-        ? `http://localhost:3000${post.featuredImage}`
-        : post.featuredImage
-    }
-    alt={post.title}
-    className="w-full h-48 object-cover rounded-md mb-4"
-  />
-)}
+              {posts?.map(post => (
+                <div key={post.id} className="border border-gray-200 rounded-lg p-4 shadow-sm">
+                  {/* Action Buttons - Added at the top right */}
+                  <div className="flex justify-end gap-2 mb-4">
+                    <button
+                      onClick={() => openPostModal(post)}
+                      className="flex items-center bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 text-sm"
+                      title="Edit Post"
+                    >
+                      <Edit2 className="w-4 h-4 mr-1" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeletePost(post.id)}
+                      className="flex items-center bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 text-sm"
+                      title="Delete Post"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete
+                    </button>
+                  </div>
 
-      {/* Title */}
-      <h2 className="text-xl font-semibold text-gray-800">{post.title}</h2>
+                  {/* Featured Image */}
+                  {post.featuredImage?.trim() && (
+                    <img
+                      src={
+                        post.featuredImage.startsWith('/')
+                          ? `http://localhost:3000${post.featuredImage}`
+                          : post.featuredImage
+                      }
+                      alt={post.title}
+                      className="w-full h-48 object-cover rounded-md mb-4"
+                    />
+                  )}
 
-      {/* Summary (if not null) */}
-      {post.summary && (
-        <p className="text-gray-600 mt-2">{post.summary}</p>
-      )}
+                  {/* Title */}
+                  <h2 className="text-xl font-semibold text-gray-800">{post.title}</h2>
 
-      {/* Category, Author, Tags */}
-      <div className="text-sm text-gray-500 mt-2 space-x-2">
-        <span>Category: <strong>{post.categoryName}</strong></span>
-        <span>Author: <strong>{post.authorName}</strong></span>
-      </div>
+                  {/* Summary (if not null) */}
+                  {post.summary && (
+                    <p className="text-gray-600 mt-2">{post.summary}</p>
+                  )}
 
-      {/* Tags */}
-      {post.tags?.length > 0 && (
-        <div className="mt-2">
-          <span className="font-medium text-gray-700">Tags:</span>
-          <div className="flex flex-wrap gap-2 mt-1">
-            {post.tags.map((tag, index) => (
-              <span
-                key={index}
-                className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+                  {/* Category, Author, Tags */}
+                  <div className="text-sm text-gray-500 mt-2 space-x-2">
+                    <span>Category: <strong>{post.categoryName}</strong></span>
+                    <span>Author: <strong>{post.authorName}</strong></span>
+                  </div>
 
-      {/* Published At */}
-      <div className="text-sm text-gray-400 mt-2">
-        {post.publishedAt ? (
-          <span>Published on: {new Date(post.publishedAt).toLocaleDateString()}</span>
-        ) : (
-          <span className="italic">Not published yet</span>
-        )}
-      </div>
+                  {/* Tags */}
+                  {post.tags?.length > 0 && (
+                    <div className="mt-2">
+                      <span className="font-medium text-gray-700">Tags:</span>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {post.tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-      {/* Views and Featured */}
-      <div className="text-sm text-gray-500 mt-2">
-        <span>Views: {post.viewCount}</span>
-        {post.isFeatured && (
-          <span className="ml-4 px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs font-semibold">
-            Featured
-          </span>
-        )}
-      </div>
-    </div>
-  ))}
-</div>
+                  {/* Published At */}
+                  <div className="text-sm text-gray-400 mt-2">
+                    {post.publishedAt ? (
+                      <span>Published on: {new Date(post.publishedAt).toLocaleDateString()}</span>
+                    ) : (
+                      <span className="italic">Not published yet</span>
+                    )}
+                  </div>
 
+                  {/* Views and Featured */}
+                  <div className="text-sm text-gray-500 mt-2">
+                    <span>Views: {post.viewCount}</span>
+                    {post.isFeatured && (
+                      <span className="ml-4 px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs font-semibold">
+                        Featured
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Manage Categories Section */}

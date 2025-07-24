@@ -21,8 +21,7 @@ export const usePostForm = (initialValues, onSubmit) => {
           errors[err.path[0]] = err.message;
         });
         
-        // This is where your error is coming from.
-        // After our fix, this block should not be entered.
+ 
         console.error('Validation Errors:', errors); 
         return errors;
       }
