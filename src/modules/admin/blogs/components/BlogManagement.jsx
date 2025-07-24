@@ -34,11 +34,11 @@ export const BlogManagement = () => {
     setShowPostModal(false);
   };
 
-  const handlePostSubmit = async (postData) => {
-    if (postData.id) {
-      await updatePostMutation.mutateAsync(postData);
+const handlePostSubmit = async (formData) => {
+    if (currentPost && currentPost.id) {
+      await updatePostMutation.mutateAsync({ id: currentPost.id, data: formData });
     } else {
-      await createPostMutation.mutateAsync(postData);
+      await createPostMutation.mutateAsync(formData);
     }
     closePostModal();
   };
@@ -124,9 +124,16 @@ export const BlogManagement = () => {
                   {/* Title */}
                   <h2 className="text-xl font-semibold text-gray-800">{post.title}</h2>
 
-                  {/* Summary (if not null) */}
+                  {/* Summary (if present) */}
                   {post.summary && (
                     <p className="text-gray-600 mt-2">{post.summary}</p>
+                  )}
+
+                  {/* Content (if present) */}
+                  {post.content && (
+                    <div className="prose max-w-none text-gray-700 mt-4">
+                      <p>{post.content}</p>
+                    </div>
                   )}
 
                   {/* Category, Author, Tags */}

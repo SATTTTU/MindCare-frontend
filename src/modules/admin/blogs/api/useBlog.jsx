@@ -37,8 +37,7 @@ export const useCreatePost = () => {
 };
 
 // Update an existing post
-const updatePost = async (postData) => {
-  const { id, ...data } = postData;
+const updatePost = async ({ id, data }) => {
   const response = await api.put(`/api/Blog/posts/${id}`, data);
   return response;
 };
