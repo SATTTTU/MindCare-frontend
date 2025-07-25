@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+
+
+
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse-custom {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes float-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* You can use these classes directly now */
+.animate-spin-custom {
+  animation: spin 1s linear infinite;
+}
+.animate-pulse-custom {
+  animation: pulse-custom 2s ease-in-out infinite;
+}
+.animate-float-in {
+  animation: float-in 0.3s ease-out;
+}

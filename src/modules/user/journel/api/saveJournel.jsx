@@ -1,36 +1,22 @@
+import { api } from "@/lib/api-client";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 
 export const useSaveJournal = () => {
-  const mutationFn = async (journalData) => {
-    const transformedData = {
-      ...journalData,
-      date: journalData.date || new Date().toISOString().split("T")[0],
-    };
+  const saveJournalMutation = useMutation({
+    mutationFn: (journalDataFromForm) => {
+      // 1. Get the raw text content from the form's values
+      const content = journalDataFromForm.text;
 
-    const response = await axios.post(
-      "http://localhost:3000/api/Journel/analyze",
-      transformedData,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      }
-    );
-    return response.data;
-  };
-
-  const mutation = useMutation({
-    mutationFn,
-    onError: (error) => {
-      throw new Error(error.response?.data?.message || "Failed to save journal");
-    }
+      // 2. POST the raw content string to the correct controller endpoint.
+      //    The URL must match your controller's route: `api/JournalEntries`.
+      //    Since your `api` instance has a baseURL of `.../api`,
+      //    the relative path is `/JournalEntries`.
+      return api.post("/api/JournalEntries", content);
+    },
   });
 
   return {
-    mutateAsync: mutation.mutateAsync,
-    isLoading: mutation.isLoading,
-    isError: mutation.isError,
-    error: mutation.error
+    ...saveJournalMutation,
+    isLoading: saveJournalMutation.isPending,
   };
 };

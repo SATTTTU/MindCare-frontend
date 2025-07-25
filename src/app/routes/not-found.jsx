@@ -11,10 +11,10 @@ import {
 import { useNavigate } from "react-router-dom";
 
 export const NotFoundPage = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleGoHome = () => {
-    // navigate("/");
+    navigate("/");
   };
 
   return (

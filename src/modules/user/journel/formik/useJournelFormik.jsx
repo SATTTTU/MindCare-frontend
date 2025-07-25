@@ -1,43 +1,64 @@
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import { journalValidationSchema } from "./schema/journelschema";
 import { useSaveJournal } from "../api/saveJournel";
+import { journalValidationSchema } from "./schema/journelschema";
 
+/**
+ * A custom hook to manage the state and submission logic for the journal form.
+ *
+ * It integrates:
+ * - Formik for form state management.
+ * - Zod for powerful, declarative validation.
+ * - TanStack Query (`useSaveJournal`) for handling the API mutation.
+ */
 export const useJournalFormik = () => {
-  const { mutateAsync, isLoading, error: apiError } = useSaveJournal();
+  // Get the mutation function and its state from the TanStack Query hook.
+  const { mutateAsync, isPending } = useSaveJournal();
 
   const formik = useFormik({
+    // Define the initial shape of the form data.
     initialValues: {
       text: "",
-      date: new Date().toISOString().split("T")[0],
+      date: new Date().toISOString().split("T")[0], // Set today's date by default
     },
+
+    // Bridge Zod schema to Formik for validation.
     validationSchema: toFormikValidationSchema(journalValidationSchema),
-    validateOnBlur: true,
-    validateOnChange: true,
-    onSubmit: async (values, { setStatus, setSubmitting, resetForm }) => {
+
+    // Define the action to take when the form is submitted.
+    onSubmit: async (values, { setStatus, resetForm, setSubmitting }) => {
+      setStatus(undefined); // Clear previous status messages.
+
       try {
+        // Call the API mutation. `mutateAsync` will throw an error on failure.
         await mutateAsync(values);
+
+        // On success, set a success message to be displayed in the UI.
         setStatus({
           success: true,
           message: "Your journal entry has been saved successfully!",
-          error: null
         });
+        
+        // Clear the form fields for the next entry.
         resetForm();
+
       } catch (error) {
+        // On failure, set an error message from the API.
         setStatus({
-          error: true,
+          success: false,
           message: error.message || "Something went wrong. Please try again.",
-          success: false
         });
       } finally {
+        // Ensure the form's submitting state is set to false after the operation.
         setSubmitting(false);
       }
     },
   });
 
+  // Return the complete formik instance, but override `isSubmitting`
+  // with the loading state from TanStack Query for a single source of truth.
   return {
     ...formik,
-    isSubmitting: isLoading,
-    apiError
+    isSubmitting: isPending,
   };
 };
