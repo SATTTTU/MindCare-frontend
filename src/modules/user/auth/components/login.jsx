@@ -2,27 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  IconButton,
-  InputAdornment,
-  Alert,
-  Link,
-  CircularProgress,
-  Divider,
-} from "@mui/material";
 import { Visibility, VisibilityOff, Email, Lock, Info } from "@mui/icons-material";
 import { useUserLoginFormik } from "../formik/useUserloginformik";
 import { useAuth } from "@/context/AuthContext";
-const focusedStyles = {
-  "& .MuiOutlinedInput-root": {
-    "&.Mui-focused fieldset": { borderColor: "#a78bfa" },
-  },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#a78bfa" },
-};
 
 export const LoginForm = () => {
   const { login, user } = useAuth();
@@ -32,176 +14,139 @@ export const LoginForm = () => {
   // Redirect if user is already logged in
   useEffect(() => {
     if (user) {
-      // Redirect based on role, assuming AuthContext provides role-based paths
-      // Or redirect to a generic dashboard
       navigate(user.role === 'Admin' ? '/admin-dashboard' : '/user-dashboard');
     }
   }, [user, navigate]);
 
-
   const { formik, isLoggingIn } = useUserLoginFormik({
     mutationConfig: {
-      // Correctly handle the successful login
-  onSuccess: (result) => {
-  console.log("✅ Login API result:", result);
+      onSuccess: (result) => {
+        console.log("✅ Login API result:", result);
 
-  if (!result || !result.token || !result.user) {
-    console.error("❌ Invalid login result structure:", result);
-    return;
-  }
+        if (!result || !result.token || !result.user) {
+          console.error("❌ Invalid login result structure:", result);
+          return;
+        }
 
-  // Pass the entire object to login
-  login({
-    token: result.token,
-    user: result.user,
-  });
-},
+        login({
+          token: result.token,
+          user: result.user,
+        });
+      },
     },
   });
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const renderTextField = (name, label, type, placeholder, Icon) => (
-    <TextField
-      fullWidth
-      name={name}
-      type={type}
-      label={label}
-      placeholder={placeholder}
-      value={formik.values[name]}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      error={formik.touched[name] && Boolean(formik.errors[name])}
-      helperText={formik.touched[name] && formik.errors[name]}
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="end">
-            {name === "password" ? (
-              <IconButton onClick={togglePasswordVisibility} edge="end" sx={{ color: "text.secondary" }}>
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            ) : (
-              <Icon sx={{ color: "text.secondary" }} />
-            )}
-          </InputAdornment>
-        ),
-        autoComplete: name === "password" ? "current-password" : "email",
-      }}
-      sx={focusedStyles}
-    />
+    <div className="relative">
+      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+        {label}
+      </label>
+      <div className="mt-1 relative rounded-md shadow-sm">
+        <input
+          id={name}
+          name={name}
+          type={type}
+          placeholder={placeholder}
+          value={formik.values[name]}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          autoComplete={name === "password" ? "current-password" : "email"}
+          className={`block w-full px-3 py-2 border rounded-md focus:outline-none sm:text-sm
+            ${
+              formik.touched[name] && formik.errors[name]
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : "border-gray-300 focus:ring-purple-500 focus:border-purple-500"
+            }`}
+        />
+        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+          {name === "password" ? (
+            <button type="button" onClick={togglePasswordVisibility} className="text-gray-400">
+              {showPassword ? <VisibilityOff /> : <Visibility />}
+            </button>
+          ) : (
+            <Icon className="text-gray-400" />
+          )}
+        </div>
+      </div>
+      {formik.touched[name] && formik.errors[name] && (
+        <p className="mt-2 text-sm text-red-600">{formik.errors[name]}</p>
+      )}
+    </div>
   );
 
   return (
-    <Box
-      component="form"
+    <form
       onSubmit={formik.handleSubmit}
-      sx={{
-        width: { xs: "100%", md: "66.666%" },
-        mx: "auto",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-      }}
+      className="w-full md:w-2/3 mx-auto flex flex-col justify-center"
       noValidate
       autoComplete="off"
     >
-      <Box textAlign="center" mb={4}>
-        <Typography
-          variant="h3"
-          component="h1"
-          sx={{
-            fontSize: { xs: "2rem", lg: "2.5rem" },
-            fontWeight: "bold",
-            background: "linear-gradient(to right, #c084fc, #38bdf8)",
-            WebkitBackgroundClip: "text",
-            color: "transparent",
-            mb: 1,
-          }}
-        >
+      <div className="text-center mb-8">
+        <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 text-transparent bg-clip-text mb-2">
           Welcome Back
-        </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ fontSize: "1.125rem" }}>
+        </h1>
+        <h2 className="text-lg text-gray-500">
           Sign in to continue your journey
-        </Typography>
-      </Box>
+        </h2>
+      </div>
 
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <div className="flex flex-col gap-6">
         {renderTextField("email", "Email Address", "email", "Enter your email", Email)}
         {renderTextField("password", "Password", showPassword ? "text" : "password", "Enter your password", Lock)}
-      </Box>
+      </div>
 
-      <Button
+      <button
         type="submit"
-        fullWidth
-        variant="contained"
         disabled={isLoggingIn || !formik.isValid || formik.isSubmitting}
-        sx={{
-          py: 1.5,
-          fontSize: "1.125rem",
-          fontWeight: 500,
-          mt: 3,
-          backgroundColor: "#a78bfa",
-          borderRadius: 2,
-          color: "#fff",
-          "&:hover": {
-            backgroundColor: "#8b5cf6",
-            boxShadow: "0 4px 12px rgba(167, 139, 250, 0.4)",
-          },
-          "&:disabled": {
-            backgroundColor: "#e5e7eb",
-            color: "#9ca3af",
-          },
-        }}
+        className="w-full py-3 text-lg font-medium mt-6 bg-purple-500 rounded-lg text-white hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-gray-200 disabled:text-gray-400"
       >
         {isLoggingIn ? (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <CircularProgress size={20} sx={{ color: "white" }} />
+          <div className="flex items-center justify-center gap-2">
+            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
             Signing In...
-          </Box>
+          </div>
         ) : (
           "Sign In"
         )}
-      </Button>
+      </button>
 
       {formik.errors.submit && (
-        <Alert severity="error" sx={{ mt: 2 }}>
+        <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
           {formik.errors.submit}
-        </Alert>
+        </div>
       )}
 
-      <Box textAlign="center" mt={3}>
-        <Typography variant="body1" color="text.secondary">
+      <div className="text-center mt-6">
+        <p className="text-base text-gray-600">
           Don’t have an account?{" "}
-          <Link
+          <button
+            type="button"
             onClick={() => navigate("/register")}
-            sx={{
-              color: "#7c3aed",
-              cursor: "pointer",
-              fontWeight: 500,
-              textDecoration: "none",
-              "&:hover": { textDecoration: "underline" },
-            }}
+            className="font-medium text-purple-700 hover:underline focus:outline-none"
           >
             Register here
-          </Link>
-        </Typography>
-      </Box>
+          </button>
+        </p>
+      </div>
 
-      <Divider sx={{ my: 3 }} />
+      <hr className="my-6" />
 
-      <Alert
-        severity="info"
-        icon={<Info />}
-        sx={{
-          backgroundColor: "#f5f3ff",
-          border: "1px solid #ddd6fe",
-          "& .MuiAlert-icon": { color: "#a78bfa" },
-        }}
-      >
-        <Typography variant="body2">
-          <strong>Secure Login:</strong> Your credentials are encrypted and never shared.
-        </Typography>
-      </Alert>
-    </Box>
+      <div className="flex items-start p-4 bg-purple-50 border border-purple-200 rounded-lg">
+        <div className="flex-shrink-0">
+          <Info className="h-5 w-5 text-purple-500" />
+        </div>
+        <div className="ml-3">
+          <p className="text-sm font-bold">
+            Secure Login:
+            <span className="font-normal"> Your credentials are encrypted and never shared.</span>
+          </p>
+        </div>
+      </div>
+    </form>
   );
 };
