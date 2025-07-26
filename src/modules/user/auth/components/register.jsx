@@ -1,20 +1,7 @@
+// src/components/auth/RegisterForm.jsx
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Checkbox,
-  FormControlLabel,
-  IconButton,
-  InputAdornment,
-  Paper,
-  Alert,
-  Link,
-  CircularProgress,
-  Divider,
-} from "@mui/material";
 import {
   Visibility,
   VisibilityOff,
@@ -25,13 +12,6 @@ import {
   Info,
 } from "@mui/icons-material";
 import { useUserRegisterFormik } from "../formik/useUserregisterformik";
-
-const focusedStyles = {
-  "& .MuiOutlinedInput-root": {
-    "&.Mui-focused fieldset": { borderColor: "#0e9300" },
-  },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#0e9300" },
-};
 
 const passwordRequirements = [
   "At least one uppercase letter (A-Z)",
@@ -59,171 +39,152 @@ export const RegisterForm = () => {
   });
 
   const renderTextField = (name, label, type, placeholder, Icon) => (
-    <TextField
-      fullWidth
-      name={name}
-      type={type}
-      label={label}
-      placeholder={placeholder}
-      value={formik.values[name]}
-      onChange={formik.handleChange}
-      onBlur={formik.handleBlur}
-      error={formik.touched[name] && Boolean(formik.errors[name])}
-      helperText={formik.touched[name] && formik.errors[name]}
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="end">
-            {name === "password" ? (
-              <IconButton onClick={togglePasswordVisibility} edge="end" sx={{ color: "text.secondary" }}>
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            ) : (
-              <Icon sx={{ color: "text.secondary" }} />
-            )}
-          </InputAdornment>
-        ),
-      }}
-      sx={focusedStyles}
-    />
+    <div className="relative">
+      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+        {label}
+      </label>
+      <div className="mt-1 relative rounded-md shadow-sm">
+        <input
+          id={name}
+          name={name}
+          type={type}
+          placeholder={placeholder}
+          value={formik.values[name]}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={`block w-full px-3 py-2 border rounded-md focus:outline-none sm:text-sm
+            ${
+              formik.touched[name] && formik.errors[name]
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+            }`}
+        />
+        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+          {name === "password" ? (
+            <button type="button" onClick={togglePasswordVisibility} className="text-gray-400">
+              {showPassword ? <VisibilityOff /> : <Visibility />}
+            </button>
+          ) : (
+            <Icon className="text-gray-400" />
+          )}
+        </div>
+      </div>
+      {formik.touched[name] && formik.errors[name] && (
+        <p className="mt-2 text-sm text-red-600">{formik.errors[name]}</p>
+      )}
+    </div>
   );
 
   return (
-    <Box
-      component="form"
+    <form
       onSubmit={formik.handleSubmit}
-      sx={{
-        width: { xs: "100%", md: "66.666%" },
-        mx: "auto",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-      }}
+      className="w-full md:w-2/3 mx-auto flex flex-col justify-center"
     >
-      <Box textAlign="center" mb={4}>
-        <Typography variant="h3" component="h1" sx={{ fontSize: { xs: "2rem", lg: "2.5rem" }, fontWeight: "bold", color: "#0e9300", mb: 1 }}>
+      <div className="text-center mb-8">
+        <h1 className="text-3xl lg:text-4xl font-bold text-green-700 mb-2">
           Join Our Community
-        </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ fontSize: "1.125rem" }}>
+        </h1>
+        <p className="text-lg text-gray-500">
           Start your journey to better mental wellness
-        </Typography>
-      </Box>
+        </p>
+      </div>
 
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <div className="flex flex-col gap-6">
         {renderTextField("name", "Full Name", "text", "Enter your full name", Person)}
         {renderTextField("email", "Email Address", "email", "Enter your email address", Email)}
         {renderTextField("password", "Password", showPassword ? "text" : "password", "Create a strong password", Lock)}
 
-        <Paper sx={{ backgroundColor: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 2, p: 2 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "#0c4a6e", mb: 1, display: "flex", alignItems: "center", gap: 1 }}>
-            <Lock fontSize="small" />
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2">
+            <Lock style={{ fontSize: '1rem' }} />
             Password Requirements:
-          </Typography>
-          <Box sx={{ pl: 3 }}>
+          </h3>
+          <div className="pl-5">
             {passwordRequirements.map((req, i) => (
-              <Typography key={i} variant="caption" sx={{ display: "flex", alignItems: "center", color: "#0c4a6e", mb: 0.5 }}>
-                <CheckCircle sx={{ fontSize: 12, mr: 1, color: "#0e9300" }} />
+              <p key={i} className="flex items-center text-xs text-blue-800 mb-1">
+                <CheckCircle className="text-green-600 mr-2" style={{ fontSize: '0.75rem' }} />
                 {req}
-              </Typography>
+              </p>
             ))}
-          </Box>
-        </Paper>
-      </Box>
+          </div>
+        </div>
+      </div>
 
-      <FormControlLabel
-        control={
-          <Checkbox
+      <div className="mt-6 flex items-start">
+        <div className="flex items-center h-5">
+          <input
+            id="terms"
+            name="terms"
+            type="checkbox"
             checked={agreeTerms}
             onChange={(e) => setAgreeTerms(e.target.checked)}
-            sx={{ color: "#0e9300", "&.Mui-checked": { color: "#0e9300" } }}
+            className="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded"
           />
-        }
-        label={
-          <Typography variant="body2" color="text.secondary">
+        </div>
+        <div className="ml-3 text-sm">
+          <label htmlFor="terms" className="text-gray-500">
             I agree to the{" "}
-            <Link onClick={() => navigate("/register/terms")} sx={{ color: "#0e9300", cursor: "pointer", fontWeight: 500, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
+            <button type="button" onClick={() => navigate("/register/terms")} className="font-medium text-green-700 hover:underline focus:outline-none">
               Terms of Service
-            </Link>{" "}
+            </button>{" "}
             and{" "}
-            <Link onClick={() => navigate("/register/policy")} sx={{ color: "#0e9300", cursor: "pointer", fontWeight: 500, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
+            <button type="button" onClick={() => navigate("/register/policy")} className="font-medium text-green-700 hover:underline focus:outline-none">
               Privacy Policy
-            </Link>
+            </button>
             . I understand that my data will be handled securely and confidentially.
-          </Typography>
-        }
-        sx={{ mt: 3, alignItems: "flex-start" }}
-      />
+          </label>
+        </div>
+      </div>
 
-      <Button
+      <button
         type="submit"
-        fullWidth
-        variant="contained"
         disabled={isRegistering || !formik.isValid || formik.isSubmitting || !agreeTerms}
-        sx={{
-          py: 1.5,
-          fontSize: "1.125rem",
-          fontWeight: 500,
-          mt: 3,
-          backgroundColor: "#238f17",
-          "&:hover": {
-            backgroundColor: "#1e7a14",
-            boxShadow: "0 4px 12px rgba(35, 143, 23, 0.3)",
-          },
-          "&:disabled": {
-            backgroundColor: "#e5e7eb",
-            color: "#9ca3af",
-          },
-          borderRadius: 2,
-        }}
+        className="w-full py-3 text-lg font-medium mt-6 bg-green-700 rounded-lg text-white hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-200 disabled:text-gray-400"
       >
         {isRegistering ? (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <CircularProgress size={20} sx={{ color: "white" }} />
+          <div className="flex items-center justify-center gap-2">
+            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
             Creating Account...
-          </Box>
+          </div>
         ) : (
           "Create Account"
         )}
-      </Button>
+      </button>
 
       {formik.errors.submit && (
-        <Alert severity="error" sx={{ mt: 2 }}>
+        <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
           {formik.errors.submit}
-        </Alert>
+        </div>
       )}
 
-      <Box textAlign="center" mt={3}>
-        <Typography variant="body1" color="text.secondary">
+      <div className="text-center mt-6">
+        <p className="text-base text-gray-600">
           Already have an account?{" "}
-          <Link
+          <button
+            type="button"
             onClick={() => navigate("/login")}
-            sx={{
-              color: "#0e9300",
-              cursor: "pointer",
-              fontWeight: 500,
-              textDecoration: "none",
-              "&:hover": { textDecoration: "underline" },
-            }}
+            className="font-medium text-green-700 hover:underline focus:outline-none"
           >
             Sign in here
-          </Link>
-        </Typography>
-      </Box>
+          </button>
+        </p>
+      </div>
 
-      <Divider sx={{ my: 3 }} />
+      <hr className="my-6" />
 
-      <Alert
-        severity="info"
-        icon={<Info />}
-        sx={{
-          backgroundColor: "#f0f9ff",
-          border: "1px solid #bae6fd",
-          "& .MuiAlert-icon": { color: "#0e9300" },
-        }}
-      >
-        <Typography variant="body2">
-          <strong>Your privacy matters.</strong> All information is encrypted and confidential. We're here to support your mental wellness journey in a safe, secure environment.
-        </Typography>
-      </Alert>
-    </Box>
+      <div className="flex items-start p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex-shrink-0">
+          <Info className="h-5 w-5 text-green-600" />
+        </div>
+        <div className="ml-3">
+          <p className="text-sm">
+            <strong className="font-bold">Your privacy matters.</strong> All information is encrypted and confidential. We're here to support your mental wellness journey in a safe, secure environment.
+          </p>
+        </div>
+      </div>
+    </form>
   );
 };
