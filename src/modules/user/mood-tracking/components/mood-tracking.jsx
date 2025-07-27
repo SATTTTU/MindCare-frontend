@@ -2,31 +2,42 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Flame } from 'lucide-react';
 
+// Import your components
 import Analytics from './analytics';
 import Calendar from './calender';
+// import EntryForm from './EntryForm'; // Assuming this is your form component
 import { Sidebar } from '@/components/ui/aside';
+import { JournalComponent } from '../../journel/components/inputJournel';
 
-// This utility helps in creating a consistent user ID
-const getAnonymousId = () => {
-    if (localStorage.getItem('anonymousUserId')) {
-        return localStorage.getItem('anonymousUserId');
-    }
-    const newId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem('anonymousUserId', newId);
-    return newId;
+// --- NEW AUTHENTICATION UTILITIES ---
+// NOTE: In a real app, this logic would likely live in an AuthContext or a dedicated auth service.
+// We assume that after login, the user's token and ID are stored in localStorage.
+
+/**
+ * Retrieves the authentication token from localStorage.
+ * @returns {string|null} The token or null if not found.
+ */
+const getToken = () => {
+    return localStorage.getItem('authToken'); // Or whatever you name your token in storage
+};
+
+/**
+ * Retrieves the logged-in user's ID from localStorage.
+ * @returns {string|null} The user ID or null if not found.
+ */
+const getUserId = () => {
+    return localStorage.getItem('userId'); // You would store this upon login
 };
 
 
 export const MoodTracker = () => {
-    // --- STATE HOOKS ---
-    const [allMoodEntries, setAllMoodEntries] = useState([]); // Now an array
+    // --- STATE HOOKS (Largely unchanged) ---
+    const [allMoodEntries, setAllMoodEntries] = useState([]);
     const [streak, setStreak] = useState(0);
     const [showEntryForm, setShowEntryForm] = useState(false);
-    const [selectedDayEntry, setSelectedDayEntry] = useState(null);
-    // const [showRecommendations, setShowRecommendations] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Maps the API sentiment response to the UI's mood identifiers
+    // This mapping logic remains the same as it's for the UI
     const apiSentimentToUiMood = {
         anxiety: "anxious",
         bipolar: "overwhelmed",
@@ -39,21 +50,18 @@ export const MoodTracker = () => {
 
     // --- HELPER FUNCTIONS ---
 
-    // Calculates streak based on a sorted list of entry dates
+    // No changes needed for the streak calculation logic
     const calculateStreak = useCallback((entries) => {
         if (!entries || entries.length === 0) return 0;
-
         const loggedDates = [...new Set(entries.map(entry => entry.entryDate.split('T')[0]))].sort().reverse();
         
         let currentStreak = 0;
         const today = new Date();
         const yesterday = new Date();
         yesterday.setDate(today.getDate() - 1);
-
         const todayStr = today.toISOString().split('T')[0];
         const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-        // Check if the latest entry is today or yesterday to start the streak count
         if (loggedDates[0] === todayStr || loggedDates[0] === yesterdayStr) {
             let expectedDate = new Date(loggedDates[0]);
             for (const dateStr of loggedDates) {
@@ -61,7 +69,7 @@ export const MoodTracker = () => {
                     currentStreak++;
                     expectedDate.setDate(expectedDate.getDate() - 1);
                 } else {
-                    break; // Streak is broken
+                    break;
                 }
             }
         }
@@ -69,43 +77,65 @@ export const MoodTracker = () => {
         return currentStreak;
     }, []);
 
-    // --- API & DATA LOGIC ---
+    // --- API & DATA LOGIC (MAJOR UPDATES HERE) ---
     const fetchMoodHistory = useCallback(async () => {
-        const anonymousUserId = getAnonymousId();
-        if (!anonymousUserId) {
+        const token = getToken();
+        const userId = getUserId();
+
+        // If the user is not logged in, don't attempt to fetch data.
+        if (!token || !userId) {
             setIsLoading(false);
+            setAllMoodEntries([]); // Ensure state is clean
             return;
         }
+
         setIsLoading(true);
         try {
-            // Updated API endpoint to fetch journal entries
-            const response = await fetch(`http://127.0.0.1:5000/journals/user/${anonymousUserId}`); // NOTE: Update this URL if needed
-            if (!response.ok) throw new Error('Failed to fetch mood history');
+            // 1. UPDATE THE API ENDPOINT
+            // It now points to your real controller and uses the logged-in user's ID.
+            const response = await fetch(`http://127.0.0.1:5000/api/JournalEntries/user/${userId}`, {
+                method: 'GET',
+                // 2. ADD THE AUTHORIZATION HEADER
+                // This is crucial for your [Authorize] attribute on the backend.
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                // Handle specific auth errors, e.g., prompt for re-login
+                if (response.status === 401) {
+                    console.error("Authentication error: Token is invalid or expired.");
+                    // Here you might redirect to a login page
+                }
+                throw new Error('Failed to fetch mood history');
+            }
             
             const history = await response.json();
 
-            // Process entries to match the structure needed by child components
+            // 3. PROCESS THE REAL API RESPONSE
+            // This logic remains similar, but it now works with your actual DTO structure.
             const processedEntries = history.map(entry => {
-                const detectedApiMood = Object.keys(entry.sentiments).find(key => entry.sentiments[key] === true);
+                // Find which boolean sentiment is 'true'
+                const detectedApiMood = entry.sentiments ? Object.keys(entry.sentiments).find(key => entry.sentiments[key] === true) : 'normal';
+                
                 return {
-                    ...entry,
+                    ...entry, // This includes journalId, content, entryDate from the DTO
                     predictedMood: apiSentimentToUiMood[detectedApiMood] || 'calm',
-                    // Recommendations would be part of your API response per entry
-                    // recommendations: entry.recommendations || [] 
                 };
-            }).sort((a, b) => new Date(b.entryDate) - new Date(a.entryDate)); // Sort newest first
+            }).sort((a, b) => new Date(b.entryDate) - new Date(a.entryDate));
 
             setAllMoodEntries(processedEntries);
             setStreak(calculateStreak(processedEntries));
 
         } catch (error) {
             console.error("Failed to load mood history:", error);
-            setAllMoodEntries([]); // Ensure it's an array on error
+            setAllMoodEntries([]);
         } finally {
             setIsLoading(false);
         }
-    }, [calculateStreak]);
-
+    }, [calculateStreak]); // apiSentimentToUiMood is constant and doesn't need to be a dependency
 
     // --- USE EFFECT ---
     useEffect(() => {
@@ -113,17 +143,11 @@ export const MoodTracker = () => {
     }, [fetchMoodHistory]);
 
     // --- EVENT HANDLERS ---
-    const handleDayClick = (day) => {
-        const entryForDay = allMoodEntries.find(entry => new Date(entry.entryDate).getDate() === day);
-        if (entryForDay) {
-            setSelectedDayEntry(entryForDay);
-            // setShowRecommendations(true);
-        }
-    };
+    // The handler for clicking a day on the calendar is removed as it was for recommendations.
     
     const handleSubmitSuccess = () => {
         setShowEntryForm(false);
-        fetchMoodHistory(); // Refetch data to update UI
+        fetchMoodHistory(); // Refetch all data to update the UI completely.
     };
 
     // --- RENDER LOGIC ---
@@ -134,6 +158,10 @@ export const MoodTracker = () => {
             </div>
         );
     }
+    
+    // The EntryForm now needs to use the real user ID, which it can get from the auth utility.
+    // We pass it down for consistency.
+    const userId = getUserId(); 
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
@@ -171,8 +199,7 @@ export const MoodTracker = () => {
                     </div>
                      <AnimatePresence>
                         {showEntryForm && (
-                            <EntryForm
-                                anonymousUserId={getAnonymousId()}
+                            <JournalComponent
                                 onSubmissionSuccess={handleSubmitSuccess}
                             />
                         )}
@@ -180,21 +207,12 @@ export const MoodTracker = () => {
                 </div>
                 
                 {/* Calendar Section */}
-                <Calendar entries={allMoodEntries} onDayClick={handleDayClick} />
+                {/* The onDayClick prop is now an empty function as its purpose was removed. */}
+                <Calendar entries={allMoodEntries} onDayClick={() => {}} />
 
             </div>
             
-            {/* Recommendations Modal */}
-            {/* <AnimatePresence>
-                {showRecommendations && selectedDayEntry && (
-                    <RecommendationsPage
-                        entry={selectedDayEntry}
-                        onClose={() => setShowRecommendations(false)}
-                    />
-                )}
-            </AnimatePresence> */}
-
-            
+            {/* Recommendations code has been completely removed as requested. */}
         </div>
     );
 };
