@@ -14,7 +14,13 @@ export const LoginForm = () => {
   // Redirect if user is already logged in
   useEffect(() => {
     if (user) {
-      navigate(user.role === 'Admin' ? '/admin-dashboard' : '/user-dashboard');
+      if (user.role === 'Admin') {
+  navigate('/admin-dashboard');
+} else if (user.role === 'doctor') {
+  navigate('/doctor-dashboard');
+} else {
+  navigate('/user-dashboard');
+}
     }
   }, [user, navigate]);
 

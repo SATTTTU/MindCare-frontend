@@ -1,22 +1,13 @@
 import React, { useState } from 'react';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  IconButton,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemText,
-  Box,
-  Divider
-} from '@mui/material';
 import { Menu, X, Heart, User, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  
+  const token = localStorage.getItem('user_token');
+  const role = localStorage.getItem('user_type');
+  const isAuthenticated = !!token;
 
   const navigation = [
     { name: 'Find Therapist', href: '/therapists' },
@@ -25,134 +16,170 @@ const Header = () => {
     { name: 'Blog', href: '/blog' }
   ];
 
+  const handleSignOut = () => {
+    localStorage.removeItem('authToken');
+    window.location.href = '/';
+  };
+
+  const dashboardLink =
+    role === 'Doctor'
+      ? '/doctor-dashboard'
+      : role === 'Admin'
+      ? '/admin-dashboard'
+      : '/user-dashboard';
+
   return (
     <>
-      <AppBar position="sticky" color="inherit" elevation={0} sx={{ borderBottom: '1px solid #e0e0e0' }}>
-        <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 4, md: 6 } }}>
+      {/* Main Header */}
+      <header className="sticky top-0 bg-white border-b border-gray-200 z-50">
+        <div className="flex justify-between items-center px-4 sm:px-8 md:px-12 py-4">
           {/* Logo */}
-          <Box component={Link} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                background: 'linear-gradient(to bottom right, #c084fc, #38bdf8)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mr: 1
-              }}
-            >
-              <Heart size={20} color="#fff" />
-            </Box>
-            <Typography variant="h6" sx={{ fontWeight: 600, background: 'linear-gradient(to right, #c084fc, #38bdf8)', WebkitBackgroundClip: 'text', color: 'transparent' }}>
+          <Link to="/" className="flex items-center no-underline">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-400 to-sky-400 flex items-center justify-center mr-2">
+              <Heart size={20} className="text-white" />
+            </div>
+            <h1 className="text-xl font-semibold bg-gradient-to-r from-purple-400 to-sky-400 bg-clip-text text-transparent">
               MindCare
-            </Typography>
-          </Box>
+            </h1>
+          </Link>
 
           {/* Desktop Navigation */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3 }}>
+          <nav className="hidden md:flex space-x-8">
             {navigation.map((item) => (
-              <Button
+              <Link
                 key={item.name}
-                component={Link}
                 to={item.href}
-                sx={{ color: '#4b5563', fontWeight: 500, textTransform: 'none', '&:hover': { color: '#a78bfa' } }}
+                className="text-gray-600 font-medium hover:text-purple-400 transition-colors duration-200"
               >
                 {item.name}
-              </Button>
+              </Link>
             ))}
-          </Box>
+          </nav>
 
-          {/* Right Side Actions */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', fontSize: 14, color: '#64748b' }}>
-              <Shield size={16} style={{ marginRight: 4 }} />
+          {/* Right Side Actions - Desktop */}
+          <div className="hidden md:flex items-center space-x-4">
+            <div className="flex items-center text-sm text-slate-500">
+              <Shield size={16} className="mr-1" />
               Your data is private
-            </Box>
-            <Button
-              variant="outlined"
-              component={Link}
-              to="/login"
-              startIcon={<User size={16} />}
-              sx={{
-                textTransform: 'none',
-                color: '#7c3aed',
-                borderColor: '#ddd6fe'
-              }}
-            >
-              Sign In
-            </Button>
-            <Button
-              variant="contained"
-              sx={{
-                textTransform: 'none',
-                backgroundColor: '#a78bfa',
-                color: '#fff',
-                borderRadius: 2,
-                '&:hover': { backgroundColor: '#8b5cf6' }
-              }}
-            >
-              Get Started
-            </Button>
-          </Box>
+            </div>
+
+            {!isAuthenticated ? (
+              <>
+                <Link to="/login">
+                  <button className="flex items-center px-4 py-2 border border-purple-200 text-purple-700 rounded-lg hover:bg-purple-50 transition-colors duration-200">
+                    <User size={16} className="mr-2" />
+                    Sign In
+                  </button>
+                </Link>
+                <button className="px-4 py-2 bg-purple-400 text-white rounded-lg hover:bg-purple-500 transition-colors duration-200">
+                  Get Started
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to={dashboardLink}>
+                  <button className="px-4 py-2 bg-purple-400 text-white rounded-lg hover:bg-purple-500 transition-colors duration-200">
+                    Go to Dashboard
+                  </button>
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                >
+                  Sign Out
+                </button>
+              </>
+            )}
+          </div>
 
           {/* Mobile Menu Button */}
-          <IconButton
-            edge="end"
-            color="inherit"
-            aria-label="menu"
-            sx={{ display: { md: 'none' } }}
+          <button
+            className="md:hidden p-2"
             onClick={() => setDrawerOpen(!isDrawerOpen)}
+            aria-label="Toggle menu"
           >
             {isDrawerOpen ? <X size={24} /> : <Menu size={24} />}
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Drawer Overlay */}
+      {isDrawerOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setDrawerOpen(false)}
+        />
+      )}
 
       {/* Mobile Drawer */}
-      <Drawer anchor="right" open={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-        <Box sx={{ width: 250 }} role="presentation" onClick={() => setDrawerOpen(false)}>
-          <List>
+      <aside
+        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 z-50 md:hidden ${
+          isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="p-4">
+          {/* Close button */}
+          <div className="flex justify-end mb-4">
+            <button onClick={() => setDrawerOpen(false)}>
+              <X size={24} />
+            </button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="space-y-2">
             {navigation.map((item) => (
-              <ListItemButton key={item.name} component={Link} to={item.href}>
-                <ListItemText primary={item.name} />
-              </ListItemButton>
+              <Link
+                key={item.name}
+                to={item.href}
+                className="block px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                onClick={() => setDrawerOpen(false)}
+              >
+                {item.name}
+              </Link>
             ))}
-          </List>
-          <Divider />
-          <Box sx={{ px: 2, py: 2 }}>
-            <Link to="/login" style={{ textDecoration: 'none' }}>
-            <Button
-              variant="outlined"
-              fullWidth
-              startIcon={<User size={16} />}
-              sx={{
-                textTransform: 'none',
-                color: '#7c3aed',
-                borderColor: '#ddd6fe',
-                mb: 1
-              }}
-            >
-              Sign In
-            </Button>
-            </Link>
-            <Button
-              variant="contained"
-              fullWidth
-              sx={{
-                textTransform: 'none',
-                backgroundColor: '#a78bfa',
-                color: '#fff',
-                borderRadius: 2,
-                '&:hover': { backgroundColor: '#8b5cf6' }
-              }}
-            >
-              Get Started
-            </Button>
-          </Box>
-        </Box>
-      </Drawer>
+          </nav>
+
+          {/* Divider */}
+          <hr className="my-4 border-gray-200" />
+
+          {/* Mobile Action Buttons */}
+          <div className="space-y-3">
+            {!isAuthenticated ? (
+              <>
+                <Link to="/login" onClick={() => setDrawerOpen(false)}>
+                  <button className="w-full flex items-center justify-center px-4 py-2 border border-purple-200 text-purple-700 rounded-lg hover:bg-purple-50 transition-colors duration-200">
+                    <User size={16} className="mr-2" />
+                    Sign In
+                  </button>
+                </Link>
+                <button
+                  className="w-full px-4 py-2 bg-purple-400 text-white rounded-lg hover:bg-purple-500 transition-colors duration-200"
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  Get Started
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to={dashboardLink} onClick={() => setDrawerOpen(false)}>
+                  <button className="w-full px-4 py-2 bg-purple-400 text-white rounded-lg hover:bg-purple-500 transition-colors duration-200">
+                    Go to Dashboard
+                  </button>
+                </Link>
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    setDrawerOpen(false);
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                >
+                  Sign Out
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </aside>
     </>
   );
 };
