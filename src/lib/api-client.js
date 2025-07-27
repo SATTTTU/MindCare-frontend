@@ -3,11 +3,14 @@ import Axios from "axios";
 const STORAGE_KEYS = {
   USER_TYPE: "user_type",
   ADMIN_TOKEN: "admin_token",
-  COOK_TOKEN: "doctor_token",
+  COOK_TOKEN: "cook_token", // shared for both cook and doctor
   USER_TOKEN: "user_token",
   ACTIVE_USER: "active_user",
   AUTH_TOKEN: "authToken",
 };
+
+// Utility to check doctor-like roles
+const isDoctorLikeUser = (role) => ["cook", "doctor"].includes(role);
 
 // Local Storage utility functions
 const setItem = (name, value) => {
@@ -57,52 +60,49 @@ function getToken() {
       }
 
       if (cookToken && cookToken !== "undefined") {
-        console.log("Found cook token without user type, setting user type to cook");
-        setItem(STORAGE_KEYS.USER_TYPE, "cook");
-        setItem(STORAGE_KEYS.ACTIVE_USER, "cook");
+        console.log("Found cook/doctor token without user type, setting user type to doctor");
+        setItem(STORAGE_KEYS.USER_TYPE, "doctor"); // default to doctor
+        setItem(STORAGE_KEYS.ACTIVE_USER, "doctor");
         return cookToken;
       }
-      
+
       if (userToken && userToken !== "undefined") {
         console.log("Found user token without user type, setting user type to user");
         setItem(STORAGE_KEYS.USER_TYPE, "user");
         setItem(STORAGE_KEYS.ACTIVE_USER, "user");
         return userToken;
       }
-      
+
       return null;
     }
 
     if (userType === "admin") {
       const token = getItem(STORAGE_KEYS.ADMIN_TOKEN) || getItem(STORAGE_KEYS.AUTH_TOKEN);
-
       if (!token || token === "undefined") {
         console.warn("⚠️ Admin token is undefined or invalid");
         return null;
       }
-
       console.log("Retrieved admin token from local storage");
       return token;
-    } else if (userType === "cook") {
-      const token = getItem(STORAGE_KEYS.COOK_TOKEN) || getItem(STORAGE_KEYS.AUTH_TOKEN);
 
+    } else if (isDoctorLikeUser(userType)) {
+      const token = getItem(STORAGE_KEYS.COOK_TOKEN) || getItem(STORAGE_KEYS.AUTH_TOKEN);
       if (!token || token === "undefined") {
-        console.warn("⚠️ Cook token is undefined or invalid");
+        console.warn("⚠️ Doctor token is undefined or invalid");
         return null;
       }
-
-      console.log("Retrieved cook token from local storage");
+      console.log("Retrieved doctor token from local storage");
       return token;
+
     } else if (userType === "user") {
       const token = getItem(STORAGE_KEYS.USER_TOKEN) || getItem(STORAGE_KEYS.AUTH_TOKEN);
-
       if (!token || token === "undefined") {
         console.warn("⚠️ User token is undefined or invalid");
         return null;
       }
-
       console.log("Retrieved user token from local storage");
       return token;
+
     } else {
       console.warn(`⚠️ Unrecognized user type: ${userType}. No token available.`);
       return null;
@@ -126,13 +126,12 @@ function saveUserData(userType, token) {
     setItem(STORAGE_KEYS.USER_TYPE, userType);
     setItem(STORAGE_KEYS.ACTIVE_USER, userType);
 
-    // Store the token for the specific user type
     if (userType === "admin") {
       setItem(STORAGE_KEYS.ADMIN_TOKEN, token);
-    } else if (userType === "cook") {
-      setItem(STORAGE_KEYS.COOK_TOKEN, token);
     } else if (userType === "user") {
       setItem(STORAGE_KEYS.USER_TOKEN, token);
+    } else if (isDoctorLikeUser(userType)) {
+      setItem(STORAGE_KEYS.COOK_TOKEN, token); // share cook_token for both
     } else {
       throw new Error(`Invalid user type: ${userType}`);
     }
@@ -148,8 +147,6 @@ function saveUserData(userType, token) {
 function authRequestInterceptor(config) {
   try {
     const token = getToken();
-    
-    // --> ADD THIS LOG
     console.log("Auth Interceptor: Checking for token...", { token });
 
     config.headers = config.headers || {};
@@ -160,18 +157,15 @@ function authRequestInterceptor(config) {
     }
 
     if (token) {
-      // --> ADD THIS LOG
       console.log("Auth Interceptor: Token found. Setting Authorization header.");
       config.headers.Authorization = `Bearer ${token}`;
     } else {
-      // --> ADD THIS LOG
       console.warn("Auth Interceptor: No token found. Request will be sent without Authorization header.");
     }
 
     return config;
   } catch (error) {
     console.error("Error in request interceptor:", error);
-    // Even if an error occurs, we return the original config
     return config;
   }
 }
@@ -191,14 +185,11 @@ console.log("🌍 API Base URL:", API_URL);
 
 api.interceptors.request.use(authRequestInterceptor);
 api.interceptors.response.use(
-  (response) => {
-    return response.data;
-  },
+  (response) => response.data,
   (error) => {
     const message = error.response?.data?.message || error.message;
     console.error("❌ API Error:", message);
 
-    // Handle unauthorized errors (401) by clearing auth data
     if (error.response && error.response.status === 401) {
       console.log("401 Unauthorized response detected, clearing auth data");
       clearAuthData();
@@ -224,12 +215,10 @@ function clearAuthData() {
   }
 }
 
-// Helper function to get current user type
 function getCurrentUserType() {
   return getItem(STORAGE_KEYS.ACTIVE_USER) || null;
 }
 
-// Additional utility functions for local storage management
 function getAllAuthItems() {
   return {
     userType: getItem(STORAGE_KEYS.USER_TYPE),
@@ -247,10 +236,10 @@ function isAuthenticated() {
   return !!(token && userType);
 }
 
-export { 
-  saveUserData, 
-  getToken, 
-  clearAuthData, 
+export {
+  saveUserData,
+  getToken,
+  clearAuthData,
   getCurrentUserType,
   getAllAuthItems,
   isAuthenticated,

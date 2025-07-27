@@ -8,7 +8,8 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
   if (!token) return <Navigate to="/login" replace />;
   if (!user) return null; // or show <LoadingSpinner />
-
+console.log("user.role:", user?.role);
+console.log("allowedRoles:", allowedRoles);
   return !allowedRoles || allowedRoles.includes(user.role)
     ? <Outlet />
     : <Navigate to="/unauthorized" replace />;
