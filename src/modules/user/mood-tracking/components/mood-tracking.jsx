@@ -51,7 +51,7 @@ export const MoodTracker = () => {
         setIsLoading(true);
         try {
             const response = await api.get(`/api/JournalEntries/user/${userId}`);
-            const history = response.data;
+            const history = response;
             
             const processedEntries = history?.map(entry => {
                 let detectedApiMood = 'normal'; 
@@ -67,7 +67,7 @@ export const MoodTracker = () => {
                     predictedMood: uiMood 
                 };
             }).sort((a, b) => new Date(b.entryDate) - new Date(a.entryDate));
-
+             console.log("Data being set to state:", processedEntries);
             setAllMoodEntries(processedEntries);
             setStreak(calculateStreak(processedEntries));
         } catch (error) {
