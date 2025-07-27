@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Flame, ArrowLeft } from 'lucide-react'; // Import the ArrowLeft icon
+import { Flame, ArrowLeft } from 'lucide-react';
 import Calendar from './calender';
 import Analytics from './analytics';
 import { JournalComponent } from '../../journel/components/inputJournel';
+import { api } from '@/lib/api-client';
 
-// --- AUTH HELPERS ---
-const getToken = () => localStorage.getItem('authToken');
 const getUserId = () => localStorage.getItem('userId');
 
 const apiSentimentToUiMood = {
@@ -42,9 +41,8 @@ export const MoodTracker = () => {
     }, []);
 
     const fetchMoodHistory = useCallback(async () => {
-        const token = getToken();
         const userId = getUserId();
-        if (!token || !userId) {
+        if (!userId) {
             setIsLoading(false);
             setAllMoodEntries([]);
             return;
@@ -52,18 +50,22 @@ export const MoodTracker = () => {
 
         setIsLoading(true);
         try {
-            const response = await fetch(`http://127.0.0.1:5000/api/JournalEntries/user/${userId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch mood history');
-            }
+            const response = await api.get(`/api/JournalEntries/user/${userId}`);
+            const history = response.data;
             
-            const history = await response.json();
-            const processedEntries = history.map(entry => {
-                const detectedApiMood = entry.sentiments ? Object.keys(entry.sentiments).find(key => entry.sentiments[key] === true) : 'normal';
-                return { ...entry, predictedMood: apiSentimentToUiMood[detectedApiMood] || 'calm' };
+            const processedEntries = history?.map(entry => {
+                let detectedApiMood = 'normal'; 
+                if (entry.sentiments) {
+                    const foundMood = Object.keys(entry.sentiments).find(key => entry.sentiments[key] === true);
+                    if (foundMood) {
+                        detectedApiMood = foundMood;
+                    }
+                }
+                const uiMood = apiSentimentToUiMood[detectedApiMood] || 'calm';
+                return { 
+                    ...entry, 
+                    predictedMood: uiMood 
+                };
             }).sort((a, b) => new Date(b.entryDate) - new Date(a.entryDate));
 
             setAllMoodEntries(processedEntries);
@@ -76,15 +78,14 @@ export const MoodTracker = () => {
         }
     }, [calculateStreak]);
 
+
     useEffect(() => {
         fetchMoodHistory();
     }, [fetchMoodHistory]);
 
-    // This function is passed to the JournalComponent
     const handleSubmitSuccess = () => {
-        // Hiding the form after submission provides good user feedback.
         setShowEntryForm(false); 
-        fetchMoodHistory(); // Refetch all data to update the UI
+        fetchMoodHistory(); 
     };
 
     if (isLoading) {
@@ -99,7 +100,6 @@ export const MoodTracker = () => {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
             <div className="max-w-4xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
                 <header className="flex justify-between items-center mb-8">
-                    {/* --- Back Arrow Button --- */}
                     <button
                         onClick={() => window.history.back()}
                         className="p-2 rounded-full hover:bg-slate-200 transition-colors duration-200"

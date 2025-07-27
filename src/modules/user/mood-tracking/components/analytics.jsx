@@ -11,12 +11,12 @@ const moodConfig = {
     overwhelmed: { label: 'Overwhelmed', color: '#fb923c' }
 };
 
-const Analytics = ({ entries }) => {
-    const moodDistribution = entries.reduce((acc, entry) => {
-        const mood = entry.predictedMood || 'calm';
-        acc[mood] = (acc[mood] || 0) + 1;
-        return acc;
-    }, {});
+const Analytics = ({ entries = [] }) => {
+   const moodDistribution = (entries || []).reduce((acc, entry) => {
+    const mood = entry.predictedMood || 'calm';
+    acc[mood] = (acc[mood] || 0) + 1;
+    return acc;
+}, {});
 
     const pieData = Object.keys(moodDistribution).map(mood => ({
         name: moodConfig[mood]?.label || 'Unknown',

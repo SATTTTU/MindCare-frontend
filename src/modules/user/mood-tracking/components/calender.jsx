@@ -11,7 +11,7 @@ const moodConfig = {
     overwhelmed: { emoji: '😵', color: 'bg-orange-400' }
 };
 
-const Calendar = ({ entries, onDayClick }) => {
+const Calendar = ({ entries=[], onDayClick }) => {
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     const entriesByDay = entries.reduce((acc, entry) => {
