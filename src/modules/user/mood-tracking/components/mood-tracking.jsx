@@ -5,6 +5,7 @@ import Calendar from './calender';
 import Analytics from './analytics';
 import { JournalComponent } from '../../journel/components/inputJournel';
 import { api } from '@/lib/api-client';
+import { useNavigate } from 'react-router-dom';
 
 const getUserId = () => localStorage.getItem('userId');
 
@@ -14,6 +15,7 @@ const apiSentimentToUiMood = {
 };
 
 export const MoodTracker = () => {
+    const navigate = useNavigate();
     const [allMoodEntries, setAllMoodEntries] = useState([]);
     const [streak, setStreak] = useState(0);
     const [showEntryForm, setShowEntryForm] = useState(false);
@@ -101,7 +103,7 @@ export const MoodTracker = () => {
             <div className="max-w-4xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
                 <header className="flex justify-between items-center mb-8">
                     <button
-                        onClick={() => window.history.back()}
+                        onClick={() => navigate('/user-dashboard')}
                         className="p-2 rounded-full hover:bg-slate-200 transition-colors duration-200"
                         aria-label="Go back to previous page"
                     >

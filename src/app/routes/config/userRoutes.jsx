@@ -22,10 +22,10 @@ export const userRoutes = [
       {
         path: paths.user.journel.path, // e.g., '/journal'
         lazy: async () => {
-          const { JournalComponent } = await import(
-            "../../../modules/user/journel/components/inputJournel"
+          const { JournelRoute } = await import(
+            "../../routes/user/journel/journel"
           );
-          return { Component: JournalComponent };
+          return { Component: JournelRoute };
         },
       },
       {
