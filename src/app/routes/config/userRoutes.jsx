@@ -28,6 +28,15 @@ export const userRoutes = [
           return { Component: JournalComponent };
         },
       },
+      {
+        path: paths.user.mood.path, // e.g., '/journal'
+        lazy: async () => {
+          const { MoodTracker } = await import(
+            "../../../modules/user/mood-tracking/components/mood-tracking"
+          );
+          return { Component: MoodTracker };
+        },
+      },
      
     ],
   },

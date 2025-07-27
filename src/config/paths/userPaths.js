@@ -56,5 +56,13 @@ export const userPaths = {
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
+   mood: {
+    path: "/mood-tracking",
+    getHref: (redirectTo) =>
+      `/mood-tracking${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
+  },
+
 
 };
