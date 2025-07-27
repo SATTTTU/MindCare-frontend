@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import { useSaveJournal } from "../api/saveJournel";
-import { journalValidationSchema } from "./schema/journelschema";
+import { useSaveJournal } from "../api/saveJournel"; // Ensure this path is correct
+import { journalValidationSchema } from "./schema/journelschema"; // Ensure this path is correct
 
 /**
  * A custom hook to manage the state and submission logic for the journal form.
@@ -13,27 +13,32 @@ import { journalValidationSchema } from "./schema/journelschema";
  */
 export const useJournalFormik = () => {
   // Get the mutation function and its state from the TanStack Query hook.
-  const { mutateAsync, isPending } = useSaveJournal();
+  // We use `isPending` for the loading state, which is the current standard in TanStack Query v5.
+  const { mutateAsync, isPending, status: mutationStatus } = useSaveJournal();
 
   const formik = useFormik({
     // Define the initial shape of the form data.
     initialValues: {
       text: "",
-      date: new Date().toISOString().split("T")[0], // Set today's date by default
+      // The date field from your schema is included, defaulting to today.
+      date: new Date().toISOString().split("T")[0], 
     },
 
     // Bridge Zod schema to Formik for validation.
     validationSchema: toFormikValidationSchema(journalValidationSchema),
 
     // Define the action to take when the form is submitted.
-    onSubmit: async (values, { setStatus, resetForm, setSubmitting }) => {
-      setStatus(undefined); // Clear previous status messages.
+    onSubmit: async (values, { setStatus, resetForm }) => {
+      // Clear previous status messages.
+      setStatus(undefined); 
 
       try {
-        // Call the API mutation. `mutateAsync` will throw an error on failure.
+        // Call the API mutation. `mutateAsync` will throw an error on failure,
+        // which is caught by the `catch` block.
         await mutateAsync(values);
 
-        // On success, set a success message to be displayed in the UI.
+        // On success, the `onSuccess` callback in `useSaveJournal` will handle
+        // data invalidation automatically. We can set a success message here.
         setStatus({
           success: true,
           message: "Your journal entry has been saved successfully!",
@@ -43,20 +48,18 @@ export const useJournalFormik = () => {
         resetForm();
 
       } catch (error) {
-        // On failure, set an error message from the API.
+        // On failure, set an error message from the API or a default one.
         setStatus({
           success: false,
           message: error.message || "Something went wrong. Please try again.",
         });
-      } finally {
-        // Ensure the form's submitting state is set to false after the operation.
-        setSubmitting(false);
       }
+      // `setSubmitting(false)` is no longer needed as `isPending` handles the loading state.
     },
   });
 
   // Return the complete formik instance, but override `isSubmitting`
-  // with the loading state from TanStack Query for a single source of truth.
+  // with the `isPending` state from TanStack Query for a single source of truth.
   return {
     ...formik,
     isSubmitting: isPending,

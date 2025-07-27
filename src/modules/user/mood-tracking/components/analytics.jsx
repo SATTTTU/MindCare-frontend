@@ -1,6 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { FileText, Play, Headphones, Zap, HeartPulse, AlertCircle, BookOpen } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 const moodConfig = {
     happy: { label: 'Happy', color: '#4ade80' },
@@ -13,7 +12,6 @@ const moodConfig = {
 };
 
 const Analytics = ({ entries }) => {
-    // Data for Pie Chart: Counts the occurrences of each mood
     const moodDistribution = entries.reduce((acc, entry) => {
         const mood = entry.predictedMood || 'calm';
         acc[mood] = (acc[mood] || 0) + 1;
@@ -26,57 +24,43 @@ const Analytics = ({ entries }) => {
         color: moodConfig[mood]?.color || '#ccc'
     }));
 
-    // Data for Bar Chart: Shows the last 7 entries
     const barData = entries.slice(0, 7).map(entry => ({
         date: new Date(entry.entryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         mood: entry.predictedMood,
-        // Assign a numeric value for charting if desired, or just use labels
-    })).reverse(); // Show oldest first
+    })).reverse();
 
     return (
         <div className="mb-8">
             <h3 className="text-xl font-semibold mb-4 text-slate-700">Your Mood Analysis</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Pie Chart for Mood Distribution */}
                 <div className="bg-white/80 backdrop-blur-sm border border-indigo-100 rounded-xl p-6 shadow-sm">
                     <h4 className="text-lg font-semibold text-slate-600 mb-4 text-center">Mood Distribution</h4>
                     {pieData.length > 0 ? (
                         <ResponsiveContainer width="100%" height={250}>
                             <PieChart>
                                 <Pie data={pieData} cx="50%" cy="50%" labelLine={false} outerRadius={80} fill="#8884d8" dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                                    {pieData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
+                                    {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                                 </Pie>
                                 <Tooltip />
                             </PieChart>
                         </ResponsiveContainer>
                     ) : <p className="text-center text-slate-500 py-16">Not enough data for a chart.</p>}
                 </div>
-
-                {/* Bar Chart for Recent Mood Trend */}
                 <div className="bg-white/80 backdrop-blur-sm border border-indigo-100 rounded-xl p-6 shadow-sm">
                     <h4 className="text-lg font-semibold text-slate-600 mb-4 text-center">Recent Mood Trend</h4>
                     {barData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={250}>
-                        <BarChart data={barData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                            <XAxis dataKey="date" stroke="#6b7280" />
-                            <YAxis allowDecimals={false} stroke="#6b7280" />
-                            <Tooltip
-                                contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid #ddd', borderRadius: '10px' }}
-                                labelFormatter={(label) => `Date: ${label}`}
-                                formatter={(value, name, props) => [`Mood: ${props.payload.mood}`]}
-                            />
-                            <Legend />
-                            <Bar dataKey="mood" name="Mood on this day" fill="#8884d8">
-                                 {barData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={moodConfig[entry.mood]?.color || '#ccc'} />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                     ) : <p className="text-center text-slate-500 py-16">Log moods to see your trend.</p>}
+                        <ResponsiveContainer width="100%" height={250}>
+                            <BarChart data={barData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                                <XAxis dataKey="date" stroke="#6b7280" />
+                                <YAxis allowDecimals={false} stroke="#6b7280" />
+                                <Tooltip contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', border: '1px solid #ddd', borderRadius: '10px' }} formatter={(value, name, props) => [`Mood: ${props.payload.mood}`]} />
+                                <Bar dataKey="mood" name="Mood">
+                                    {barData.map((entry, index) => <Cell key={`cell-${index}`} fill={moodConfig[entry.mood]?.color || '#ccc'} />)}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    ) : <p className="text-center text-slate-500 py-16">Log moods to see your trend.</p>}
                 </div>
             </div>
         </div>
