@@ -10,7 +10,7 @@ const STORAGE_KEYS = {
 };
 
 // Utility to check doctor-like roles
-const isDoctorLikeUser = (role) => ["cook", "doctor"].includes(role);
+const isDoctorLikeUser = (role) => ["cook", "doctor"].includes((role || "").toLowerCase());
 
 // Local Storage utility functions
 const setItem = (name, value) => {
@@ -44,10 +44,11 @@ const removeItem = (name) => {
 
 function getToken() {
   try {
-    const userType = getItem(STORAGE_KEYS.USER_TYPE);
+    const userTypeRaw = getItem(STORAGE_KEYS.USER_TYPE);
+    const userType = (userTypeRaw || "").toLowerCase();
 
-    if (!userType) {
-      // If no user type is set, try to check if any token exists in local storage
+    if (!userTypeRaw) {
+      // Fallback: No user_type defined but token exists
       const adminToken = getItem(STORAGE_KEYS.ADMIN_TOKEN) || getItem(STORAGE_KEYS.AUTH_TOKEN);
       const cookToken = getItem(STORAGE_KEYS.COOK_TOKEN);
       const userToken = getItem(STORAGE_KEYS.USER_TOKEN);
@@ -61,7 +62,7 @@ function getToken() {
 
       if (cookToken && cookToken !== "undefined") {
         console.log("Found cook/doctor token without user type, setting user type to doctor");
-        setItem(STORAGE_KEYS.USER_TYPE, "doctor"); // default to doctor
+        setItem(STORAGE_KEYS.USER_TYPE, "doctor");
         setItem(STORAGE_KEYS.ACTIVE_USER, "doctor");
         return cookToken;
       }
@@ -104,7 +105,7 @@ function getToken() {
       return token;
 
     } else {
-      console.warn(`⚠️ Unrecognized user type: ${userType}. No token available.`);
+      console.warn(`⚠️ Unrecognized user type: ${userTypeRaw}. No token available.`);
       return null;
     }
   } catch (error) {
@@ -113,16 +114,17 @@ function getToken() {
   }
 }
 
-function saveUserData(userType, token) {
+function saveUserData(userTypeRaw, token) {
   try {
-    if (!userType || !token) {
+    if (!userTypeRaw || !token) {
       console.warn("⚠️ Missing user type or token for saving to local storage");
       return false;
     }
 
+    const userType = userTypeRaw.toLowerCase(); // Normalize
+
     console.log(`Saving ${userType} data to local storage`);
 
-    // Set the user type and active user
     setItem(STORAGE_KEYS.USER_TYPE, userType);
     setItem(STORAGE_KEYS.ACTIVE_USER, userType);
 
@@ -131,7 +133,7 @@ function saveUserData(userType, token) {
     } else if (userType === "user") {
       setItem(STORAGE_KEYS.USER_TOKEN, token);
     } else if (isDoctorLikeUser(userType)) {
-      setItem(STORAGE_KEYS.COOK_TOKEN, token); // share cook_token for both
+      setItem(STORAGE_KEYS.COOK_TOKEN, token); // for both cook and doctor
     } else {
       throw new Error(`Invalid user type: ${userType}`);
     }
@@ -175,7 +177,6 @@ if (!API_URL) {
   console.error("❌ API URL is not defined in the .env file");
 }
 
-// Create Axios instance
 export const api = Axios.create({
   baseURL: API_URL,
   withCredentials: false,
@@ -207,7 +208,6 @@ function clearAuthData() {
     removeItem(STORAGE_KEYS.USER_TOKEN);
     removeItem(STORAGE_KEYS.ACTIVE_USER);
     removeItem(STORAGE_KEYS.AUTH_TOKEN);
-
     console.log("🔒 All auth data cleared from local storage");
   } catch (error) {
     console.error("Error clearing auth data:", error);
@@ -216,7 +216,7 @@ function clearAuthData() {
 }
 
 function getCurrentUserType() {
-  return getItem(STORAGE_KEYS.ACTIVE_USER) || null;
+  return (getItem(STORAGE_KEYS.ACTIVE_USER) || "").toLowerCase();
 }
 
 function getAllAuthItems() {
