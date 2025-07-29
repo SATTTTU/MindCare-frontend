@@ -1,8 +1,8 @@
 
 export const adminPaths = {
   root: {
-    path: "/",
-    getHref: () => "/",
+    path: "/admin",
+    getHref: () => "/admin",
   },
 
   dashboard: {
@@ -20,9 +20,9 @@ export const adminPaths = {
       }`,
   },
     blogs: {
-    path: "/blogs",
+    path: "/admin/blogs",
     getHref: (redirectTo) =>
-      `/blogs${
+      `/admin/blogs${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },

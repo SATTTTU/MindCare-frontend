@@ -37,6 +37,16 @@ export const userRoutes = [
           return { Component: MoodTracker };
         },
       },
+      {
+        path: paths.user.blogs.path, // e.g., '/journal'
+        lazy: async () => {
+          const { BlogCards } = await import(
+            "../../../modules/user/blogs/components/blog"
+          );
+          return { Component: BlogCards };
+        },
+      },
+
      
     ],
   },
