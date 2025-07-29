@@ -7,7 +7,8 @@ import ProtectedRoute from "./protectedRoutes";
 export const therapistRoutes = [
   {
     path: paths.therapists.root.path,
-    element: <ProtectedRoute allowedRoles={['Doctor']}>  {/* or 'Therapist' based on your role */}
+    element: <ProtectedRoute allowedRoles={['Doctor','User','Admin']}>  {/* or 'Therapist' based on your role */}
+
       <Outlet />
     </ProtectedRoute>,
     ErrorBoundary: AppRootErrorBoundary,

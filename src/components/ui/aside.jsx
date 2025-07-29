@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { MdDashboard, MdPayments } from "react-icons/md";
-import { CiUser } from "react-icons/ci";
+import { CiUser, CiViewBoard } from "react-icons/ci";
 import { FaCookie } from "react-icons/fa";
 import { TbReportSearch } from "react-icons/tb";
 import { FiLogOut, FiMenu } from "react-icons/fi";
@@ -19,6 +19,7 @@ export const Sidebar = () => {
     {to:"/journel", icon: <CiUser />, text: "Journel" },
     { to: "/appointments", icon: <CiUser />, text: "Appointments " },
     { to: "/mood-tracking", icon: <FaCookie />, text: "Mood Tracking " },
+    {to:"/blogs",icon:<CiViewBoard/>, text: "Blogs" },
     { to: "/activities", icon: <MdPayments />, text: "Wellness Activities " },
     { to: "/help", icon: <TbReportSearch />, text: "Help & Supports" },
   ];

@@ -1,6 +1,6 @@
 export const therapistPaths = {
   root: {
-    path: "/therapist",
+    path: "",
     getHref: () => "/therapist",
   },
 
