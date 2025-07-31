@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Filter, X, Star, Users, Calendar, MapPin, GraduationCap, Heart, Brain, Smile, Frown, Meh } from 'lucide-react';
 
-const DoctorBookingSystem = () => {
+ export const DoctorBookingSystem = () => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
@@ -492,14 +492,7 @@ const DoctorBookingSystem = () => {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="bg-white border-t py-6 mt-12">
-        <div className="container mx-auto px-6 text-center text-gray-500">
-          <p>© 2024 Medical Appointment System. All rights reserved.</p>
-        </div>
-      </footer>
+    
     </div>
   );
 };
-
-export default DoctorBookingSystem;

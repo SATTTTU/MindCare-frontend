@@ -69,6 +69,13 @@ export const userPaths = {
       `/blogs${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
+  },
+  therapists:{
+    path: "/therapists",
+    getHref: (redirectTo) =>
+      `/therapists${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
   }
 
 

@@ -46,6 +46,15 @@ export const userRoutes = [
           return { Component: BlogCards };
         },
       },
+      {
+        path: paths.user.therapists.path, // e.g., '/journal'
+        lazy: async () => {
+          const { DoctorBookingSystem } = await import(
+            "../../../modules/user/therapists/component/DoctorBooking"
+          );
+          return { Component: DoctorBookingSystem };
+        },
+      },
 
      
     ],
