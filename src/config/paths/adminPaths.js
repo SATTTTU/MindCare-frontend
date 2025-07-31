@@ -6,23 +6,23 @@ export const adminPaths = {
   },
 
   dashboard: {
-    path: "/admin-dashboard",
+    path: "admin-dashboard",
     getHref: (redirectTo) =>
-      `/admin-dashboard${
+      `admin-dashboard${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
    users: {
-    path: "/get-users",
+    path: "get-users",
     getHref: (redirectTo) =>
-      `/get-users${
+      `get-users${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
     blogs: {
-    path: "/admin/blogs",
+    path: "blogs",
     getHref: (redirectTo) =>
-      `/admin/blogs${
+      `blogs${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
