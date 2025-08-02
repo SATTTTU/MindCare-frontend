@@ -1,3 +1,4 @@
+// src/routes/therapistRoutes.js
 import { lazy } from "react";
 import { Outlet } from "react-router-dom";
 import { AppRootErrorBoundary, AuthRoot } from "../app/root";
@@ -7,8 +8,7 @@ import ProtectedRoute from "./protectedRoutes";
 export const therapistRoutes = [
   {
     path: paths.therapists.root.path,
-    element: <ProtectedRoute allowedRoles={['Doctor','User','Admin']}>  {/* or 'Therapist' based on your role */}
-
+    element: <ProtectedRoute allowedRoles={['User', 'Admin']}> {/* User role should be able to apply */}
       <Outlet />
     </ProtectedRoute>,
     ErrorBoundary: AppRootErrorBoundary,
@@ -17,23 +17,22 @@ export const therapistRoutes = [
         element: <AuthRoot />,
         children: [
            {
+            // The single route that handles the entire multi-step registration
             path: paths.therapists.onboarding.path,
             lazy: async () => {
-              const { DoctorForm } = await import("../../../modules/therapist/components/onboarding");
-              return {
-                Component: DoctorForm,
-              };
+              const { DoctorRegistrationPage } = await import("../../routes/therapists/registrationPage");
+              return { Component: DoctorRegistrationPage };
             },
           },
-          {
-            path: paths.therapists.be_therapist.path,
-            lazy: async () => {
-              const { MultiStepForm } = await import("../../../modules/therapist/components/MultiStepForm");
-              return {
-                Component: MultiStepForm,
-              };
-            },
-          },
+          // REMOVED: The direct route to MultiStepForm is gone.
+          // {
+          //   // Add a route for the success page
+          //   path: paths.therapists.applicationReview.path,
+          //   lazy: async () => {
+          //     const { ApplicationReviewPage } = await import("../../../modules/therapist/components/ApplicationReviewPage"); // Example component
+          //     return { Component: ApplicationReviewPage };
+          //   }
+          // }
         ],
       },
     ],

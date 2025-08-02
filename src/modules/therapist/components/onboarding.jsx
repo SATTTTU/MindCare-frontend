@@ -1,16 +1,18 @@
-// components/DoctorForm.jsx
+// src/modules/therapist/components/onboarding/DoctorForm.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useDoctorRegisterFormik } from "../formik/useDoctorRegister";
 
-export const DoctorForm = () => {
-  const navigate = useNavigate();
+// This component now accepts an `onSuccess` prop
+export const DoctorForm = ({ onSuccess }) => {
   const [agree, setAgree] = useState(false);
 
   const { formik, isRegistering } = useDoctorRegisterFormik({
     mutationConfig: {
-      onSuccess: () => {
-        setTimeout(() => navigate("/become-therapist"), 2000);
+      // CRITICAL CHANGE: Call the onSuccess prop from the parent
+      onSuccess: (result) => {
+        if (onSuccess) {
+          onSuccess(result); // Pass the API result up to the parent
+        }
       },
       onError: (error) => {
         console.error("Doctor registration failed:", error);
@@ -18,6 +20,7 @@ export const DoctorForm = () => {
     },
   });
 
+  // Your renderInput function remains the same...
   const renderInput = (name, label, placeholder) => (
     <div className="mb-4">
       <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
@@ -48,7 +51,7 @@ export const DoctorForm = () => {
       onSubmit={formik.handleSubmit}
       className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg space-y-4"
     >
-      <h2 className="text-2xl font-bold text-center text-green-700">Doctor Registration</h2>
+      <h2 className="text-2xl font-bold text-center text-green-700">Doctor Registration - Step 1</h2>
 
       {renderInput("name", "Full Name", "Dr. Jane Doe")}
       {renderInput("specialization", "Specialization", "Cardiology, Pediatrics, etc.")}
@@ -72,7 +75,7 @@ export const DoctorForm = () => {
         disabled={isRegistering || !formik.isValid || formik.isSubmitting || !agree}
         className="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800 transition disabled:opacity-50"
       >
-        {isRegistering ? "Registering..." : "Register Doctor"}
+        {isRegistering ? "Registering..." : "Register and Proceed to Document Upload"}
       </button>
 
       {formik.errors.submit && (

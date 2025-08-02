@@ -1,109 +1,68 @@
-// MultiStepForm.jsx - Updated with cook_id handling
+// src/modules/therapist/components/MultiStepForm.jsx
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Stepper from "./stepper";
 import { ChevronRight } from "lucide-react";
-import { useCookDocumentFormik } from "../formik/useDocumentUpload";
 import { CitizenshipUploadStep } from "./citizenshipUpload";
 import CertificatesStep from "./certificates";
 import TermsStep from "./termscond";
+import { useDoctorDocumentFormik } from "../formik/useDocumentUpload";
 
-// Main MultiStepForm Component
-export const MultiStepForm = () => {
+export const MultiStepForm = ({ doctorId }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
-  const [clientId, setClientId] = useState(null);
+  
+  // *** FIX: Add state for userData ***
   const [userData, setUserData] = useState(null);
 
+  // *** FIX: Add useEffect to load userData from localStorage ***
   useEffect(() => {
+    // This effect runs once to get user display info from storage.
     const storedUserData = localStorage.getItem("userData");
-    let userDataObj = null;
-
     if (storedUserData) {
       try {
-        userDataObj = JSON.parse(storedUserData);
-        setUserData(userDataObj);
+        setUserData(JSON.parse(storedUserData));
       } catch (error) {
         console.error("Error parsing userData from localStorage:", error);
       }
     }
+  }, []); // Empty dependency array ensures it runs only once on mount.
 
-    // Prioritize userId from localStorage after successful login
-    const loggedInUserId = localStorage.getItem("userId");
-    const cookId = localStorage.getItem("therapist_id ");
-    const storedClientId = localStorage.getItem("cookClientId");
-    const params = new URLSearchParams(location.search);
-    const urlClientId = params.get("clientId");
-    const stateClientId = location.state?.clientId;
-
-    const id =
-      loggedInUserId ||
-      cookId ||
-      storedClientId ||
-      urlClientId ||
-      stateClientId ||
-      userDataObj?.id;
-
-    if (id) {
-      setClientId(id);
-      localStorage.setItem("cook_id", id);
-      console.log("Using cook ID:", id);
-    } else {
-      console.error("No cook ID found. User needs to restart registration.");
-    }
-  }, [location]);
-
-  const { formik, isRegistering } = useCookDocumentFormik({
+  const { formik, isRegistering } = useDoctorDocumentFormik({
+    doctorId: doctorId,
     mutationConfig: {
       onSuccess: () => {
-        navigate("/cook/underReview", {
-          state: { clientId },
-        });
+        navigate("/therapist/application-review");
       },
       onError: (error) => {
         console.error("❌ Documents submission failed:", error);
       },
     },
-
-    initialValues: {
-      clientId: clientId,
-    },
   });
-
-  useEffect(() => {
-    if (clientId && formik.values.clientId !== clientId) {
-      formik.setFieldValue("clientId", clientId);
-    }
-  }, [clientId, formik]);
 
   const validateStep = (step) => {
     switch (step) {
       case 1:
+        // Trigger validation for the first step fields
         formik.setFieldTouched("passwordsizedphoto", true);
         formik.setFieldTouched("citizenshipFront", true);
         formik.setFieldTouched("citizenshipBack", true);
-        formik.validateField("passwordsizedphoto");
-        formik.validateField("citizenshipFront");
-        formik.validateField("citizenshipBack");
+        
+        // Return true if all required fields for this step are valid and filled
         return (
-          !formik.errors.passwordsizedphoto &&
-          !formik.errors.citizenshipFront &&
-          !formik.errors.citizenshipBack &&
           formik.values.passwordsizedphoto &&
           formik.values.citizenshipFront &&
-          formik.values.citizenshipBack
+          formik.values.citizenshipBack &&
+          !formik.errors.passwordsizedphoto &&
+          !formik.errors.citizenshipFront &&
+          !formik.errors.citizenshipBack
         );
-
       case 2:
-        return true;
-
+        return true; // No validation for certificates step
       case 3:
         formik.setFieldTouched("termsAccepted", true);
-        formik.validateField("termsAccepted");
-        return !formik.errors.termsAccepted && formik.values.termsAccepted;
-
+        return formik.values.termsAccepted && !formik.errors.termsAccepted;
       default:
         return true;
     }
@@ -112,6 +71,9 @@ export const MultiStepForm = () => {
   const handleNext = () => {
     if (validateStep(currentStep)) {
       setCurrentStep((prev) => Math.min(prev + 1, 3));
+    } else {
+      // If validation fails, manually trigger validation to show errors
+      formik.validateForm();
     }
   };
 
@@ -119,19 +81,12 @@ export const MultiStepForm = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
+  const isLastStep = currentStep === 3;
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (validateStep(currentStep)) {
-      if (isLastStep) {
-        formik.handleSubmit(e);
-      } else {
-        formik.validateForm().then((errors) => {
-          if (Object.keys(errors).length === 0) {
-            handleNext();
-          }
-        });
-      }
+      formik.handleSubmit(e);
     }
   };
 
@@ -142,23 +97,23 @@ export const MultiStepForm = () => {
       case 2:
         return <CertificatesStep formik={formik} />;
       case 3:
+        // Pass userData to the TermsStep component
         return <TermsStep formik={formik} userData={userData} />;
       default:
         return null;
     }
   };
 
-  const isLastStep = currentStep === 3;
-
-  if (!clientId) {
+  if (!doctorId) {
     return (
-      <div className="w-3/4 mx-auto p-6 pt-10 bg-white rounded-lg shadow-md">
-        <div className="text-red-500 font-bold">
-          No client ID found. Please restart the registration process.
-        </div>
+      <div className="w-3/4 mx-auto p-6 pt-10 bg-white rounded-lg shadow-md text-center">
+        <h2 className="text-xl font-bold text-red-600">Error: Missing Information</h2>
+        <p className="mt-2 text-gray-700">
+          The Doctor ID was not found. Please start the registration process from the beginning.
+        </p>
         <button
-          onClick={() => navigate("/cook/register")}
-          className="mt-4 px-4 py-2 bg-[#426B1F] text-white rounded hover:bg-[#426B1G]"
+          onClick={() => navigate("/therapist/register-as-therapist")}
+          className="mt-4 px-4 py-2 bg-[#426B1F] text-white rounded hover:bg-[#3b5f1d]"
         >
           Go to Registration
         </button>
@@ -167,76 +122,68 @@ export const MultiStepForm = () => {
   }
 
   return (
-		<div className="w-3/4 mx-auto p-6 pt-10 bg-white rounded-lg shadow-md">
-			<ToastContainer />
-			<Stepper
-				currentStep={currentStep}
-				steps={["Citizenship", "Certificates", "Terms"]}
-			/>
+    <div className="w-3/4 mx-auto p-6 pt-10 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold text-center text-green-700 mb-4">Upload Your Documents - Step 2</h2>
+      <ToastContainer />
+      <Stepper
+        currentStep={currentStep}
+        steps={["Identity", "Certificates", "Terms & Conditions"]}
+      />
 
-			{userData && (
-				<div className="mb-4 p-3 bg-green-50 rounded-md">
-					<h3 className="font-medium text-green-800">
-						Welcome, {userData?.name}
-					</h3>
-					<p className="text-sm text-green-700">Email: {userData.email}</p>
-				</div>
-			)}
+      {/* This block will now work correctly */}
+      {userData && (
+        <div className="mb-4 p-3 bg-green-50 rounded-md">
+          <h3 className="font-medium text-green-800">
+            Welcome, {userData?.name}
+          </h3>
+          <p className="text-sm text-green-700">Email: {userData.email}</p>
+        </div>
+      )}
 
-			<form onSubmit={handleSubmit} className="mt-8">
-				{renderStep()}
+      {/* Changed to use handleNext for all non-last steps */}
+      <form onSubmit={isLastStep ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }} className="mt-8">
+        {renderStep()}
 
-				{formik.errors.submit && (
-					<div className="text-red-500 mt-4">{formik.errors.submit}</div>
-				)}
+        {formik.errors.submit && (
+          <div className="text-red-500 mt-4">{formik.errors.submit}</div>
+        )}
 
-				<div className="flex justify-between mt-8">
-					{currentStep > 1 && (
-						<button
-							type="button"
-							onClick={handlePrevious}
-							className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-							disabled={formik.isSubmitting || isRegistering}
-						>
-							Back
-						</button>
-					)}
-
-					{isLastStep ? (
-					<button
-          type="submit"
-          className={`px-4 py-2 rounded flex items-center transition-colors duration-200
-            ${formik.isSubmitting || isRegistering || !formik.values.termsAccepted
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-[#426B1F] text-white hover:bg-[#3b5f1d]"}`
-          }
-          disabled={
-            formik.isSubmitting ||
-            isRegistering ||
-            !formik.values.termsAccepted
-          }
-        >
-          {formik.isSubmitting || isRegistering
-            ? "Submitting..."
-            : "Submit"}
-          {(formik.isSubmitting || isRegistering) && (
-            <ChevronRight className="ml-1 h-4 w-4" />
+        <div className="flex justify-between mt-8">
+          {currentStep > 1 && (
+            <button
+              type="button"
+              onClick={handlePrevious}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+              disabled={isRegistering}
+            >
+              Back
+            </button>
           )}
-        </button>
-        
-					) : (
-						<button
-							type="button"
-							onClick={handleNext}
-							className="px-4 py-2 bg-[#426B1F] text-white rounded hover:bg-[#426B1H] flex items-center"
-							disabled={formik.isSubmitting || isRegistering}
-						>
-							Next
-							<ChevronRight className="ml-1 h-4 w-4" />
-						</button>
-					)}
-				</div>
-			</form>
-		</div>
-	);
+
+          {isLastStep ? (
+            <button
+              type="submit"
+              className={`px-4 py-2 rounded flex items-center transition-colors duration-200 ${
+                isRegistering || !formik.values.termsAccepted
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#426B1F] text-white hover:bg-[#3b5f1d]"
+              }`}
+              disabled={isRegistering || !formik.values.termsAccepted}
+            >
+              {isRegistering ? "Submitting..." : "Submit Application"}
+            </button>
+          ) : (
+            <button
+              type="submit" // This now triggers handleNext via the form's onSubmit
+              className="px-4 py-2 bg-[#426B1F] text-white rounded hover:bg-[#3b5f1d] flex items-center"
+              disabled={isRegistering}
+            >
+              Next
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </form>
+    </div>
+  );
 };
