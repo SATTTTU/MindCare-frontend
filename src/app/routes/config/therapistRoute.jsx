@@ -24,15 +24,14 @@ export const therapistRoutes = [
               return { Component: DoctorRegistrationPage };
             },
           },
-          // REMOVED: The direct route to MultiStepForm is gone.
-          // {
-          //   // Add a route for the success page
-          //   path: paths.therapists.applicationReview.path,
-          //   lazy: async () => {
-          //     const { ApplicationReviewPage } = await import("../../../modules/therapist/components/ApplicationReviewPage"); // Example component
-          //     return { Component: ApplicationReviewPage };
-          //   }
-          // }
+          {
+            // Add a route for the success page
+            path: paths.therapists.applicationReview.path,
+            lazy: async () => {
+              const { ApplicationReviewPage } = await import("../../../modules/therapist/components/reviewPage"); // Example component
+              return { Component: ApplicationReviewPage };
+            }
+          }
         ],
       },
     ],
