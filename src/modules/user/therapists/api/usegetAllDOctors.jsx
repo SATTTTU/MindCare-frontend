@@ -1,7 +1,7 @@
 import { api } from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 
-const getBlogs = async () => {
+const getTherapists = async () => {
   const response = await api.get('/api/User/therapists');
   return response;
 };
@@ -9,7 +9,7 @@ const getBlogs = async () => {
 export const useGetBlogs = (options = {}) => {
   return useQuery({
     queryKey: ['therapists'],
-    queryFn: getBlogs,
+    queryFn: getTherapists,
     ...options
   });
 };
