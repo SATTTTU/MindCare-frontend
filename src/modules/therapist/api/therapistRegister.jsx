@@ -1,17 +1,24 @@
-import { api } from "@/lib/api-client";
-import { useQueryClient } from "@tanstack/react-query";
+// api/doctorApi.js
+import { api } from "@/lib/api-client"; // or axios.create({ baseURL })
+import { useMutation } from "@tanstack/react-query";
 
-const createApplication = async (profileData) => {
-  const response = await api.post('/api/doctor-applications/apply', profileData);
+const registerDoctor = async (doctorData) => {
+  const response = await api.post("/api/doctor-applications/apply", doctorData);
   return response;
 };
 
-export const useCreateCategory = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: createApplication,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['applicatiomn'] });
-    }
+
+export const useDoctorRegister = ({ mutationConfig } = {}) => {
+  const mutation = useMutation({
+    mutationFn: registerDoctor,
+    ...mutationConfig,
   });
+
+  return {
+    mutateAsync: mutation.mutateAsync,
+    isLoading: mutation.isPending,
+    error: mutation.error,
+    isError: mutation.isError,
+    isSuccess: mutation.isSuccess,
+  };
 };

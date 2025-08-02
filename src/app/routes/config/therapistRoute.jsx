@@ -16,6 +16,15 @@ export const therapistRoutes = [
       {
         element: <AuthRoot />,
         children: [
+           {
+            path: paths.therapists.onboarding.path,
+            lazy: async () => {
+              const { DoctorForm } = await import("../../../modules/therapist/components/onboarding");
+              return {
+                Component: DoctorForm,
+              };
+            },
+          },
           {
             path: paths.therapists.be_therapist.path,
             lazy: async () => {

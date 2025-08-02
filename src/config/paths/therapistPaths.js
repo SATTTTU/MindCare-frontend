@@ -3,6 +3,13 @@ export const therapistPaths = {
     path: "",
     getHref: () => "/therapist",
   },
+   onboarding: {
+    path: "register-as-therapist",
+    getHref: (redirectTo) =>
+      `register-as-therapist${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
+  },
 
   be_therapist: {
     path: "become-therapist",

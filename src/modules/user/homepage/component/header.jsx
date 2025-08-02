@@ -10,7 +10,7 @@ const Header = () => {
   const isAuthenticated = !!token;
 
   const navigation = [
-    { name: 'Find Therapist', href: '/therapists' },
+    { name: 'Be a  Therapist', href: '/register-as-therapist' },
     { name: 'Self-Help', href: '/self-help' },
     { name: 'Community', href: '/community' },
     { name: 'Blog', href: '/blog' }
