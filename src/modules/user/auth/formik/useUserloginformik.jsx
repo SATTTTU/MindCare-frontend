@@ -3,9 +3,8 @@ import { useFormik } from "formik";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import { loginSchema } from "./schema/authSchema";
-import { useUserLogin } from "../api/login";
-import { saveUserData } from "@/lib/api-client";
+import { loginSchema } from "./schema/authSchema"; // Ensure path is correct
+import { useUserLogin } from "../api/login"; // Ensure path is correct
 
 export const useUserLoginFormik = (config = {}) => {
   const { mutateAsync, isLoading: isLoggingIn } = useUserLogin({
@@ -23,43 +22,27 @@ export const useUserLoginFormik = (config = {}) => {
     onSubmit: async (values, helpers) => {
       try {
         const result = await mutateAsync(values);
-        helpers.setStatus({ success: true, message: "Login successful" });
-        helpers.resetForm();
-
-        toast.success("✅ Login successful! Welcome back!", {
-          position: "top-right",
-          autoClose: 2000,
-        });
-
-        // Store the user's ID in localStorage
-      if (result && result.user && result.token) {
-  localStorage.setItem("userId", result.user.id);
-   saveUserData(result.user.role.toLowerCase(), result.token);
-}
-
+        
+        // Its only job is to call the onSuccess function passed to it.
         if (config?.mutationConfig?.onSuccess) {
           config.mutationConfig.onSuccess(result);
         }
+
+        helpers.resetForm();
+
       } catch (err) {
         console.error("Login error:", err);
-
         const errorMessage =
           err instanceof AxiosError && err.response
             ? err.response.data?.message || "An unexpected error occurred."
             : "Network error. Please check your connection.";
 
-        const errorStatus = err instanceof AxiosError ? err.response?.status : null;
-
-        if (errorStatus === 401) {
+        if (err.response?.status === 401) {
           helpers.setErrors({ submit: "Invalid email or password." });
-          toast.error("❌ Invalid credentials. Please try again!", { position: "top-right" });
+          toast.error("❌ Invalid credentials. Please try again.", { position: "top-right" });
         } else {
           helpers.setErrors({ submit: errorMessage });
           toast.error(`⚠️ ${errorMessage}`, { position: "top-right" });
-        }
-
-        if (config?.mutationConfig?.onError) {
-          config.mutationConfig.onError(err);
         }
       } finally {
         helpers.setSubmitting(false);

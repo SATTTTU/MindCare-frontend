@@ -22,7 +22,7 @@ export const ApplicationReviewPage = () => {
   }, []);
 
   const handleGoToDashboard = () => {
-    // Navigate to your main dashboard or home page
+    
     navigate('/'); 
   };
 

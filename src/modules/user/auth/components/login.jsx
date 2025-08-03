@@ -1,7 +1,7 @@
 // src/components/auth/LoginForm.jsx
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Visibility, VisibilityOff, Email, Lock, Info } from "@mui/icons-material";
 import { useUserLoginFormik } from "../formik/useUserloginformik";
 import { useAuth } from "@/context/AuthContext";
@@ -11,33 +11,38 @@ export const LoginForm = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  // Redirect if user is already logged in
+  // This useEffect handles redirecting a user who is already logged in
   useEffect(() => {
     if (user) {
-      if (user.role === 'Admin') {
-  navigate('/admin-dashboard');
-} else if (user.role === 'Doctor') {
-  navigate('/doctor-dashboard');
-} else {
-  navigate('/user-dashboard');
-}
+      // The redirect logic here mirrors the logic in the context's login function
+      const { role, doctorInfo } = user;
+      if (role.toLowerCase() === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (doctorInfo) {
+        switch (doctorInfo.applicationStatus.toLowerCase()) {
+          case 'approved': navigate('/doctor-dashboard'); break;
+          case 'rejected': navigate('/application-rejected'); break;
+          case 'pending': navigate('/application-review'); break;
+          default: navigate('/register-as-therapist'); break;
+        }
+      } else {
+        navigate('/therapist/register-as-therapist');
+      }
     }
   }, [user, navigate]);
 
   const { formik, isLoggingIn } = useUserLoginFormik({
     mutationConfig: {
       onSuccess: (result) => {
-        console.log("✅ Login API result:", result);
-
+        // This is the connection point.
+        // It passes the entire API result to the context's login function.
         if (!result || !result.token || !result.user) {
           console.error("❌ Invalid login result structure:", result);
+          toast.error("An unexpected login error occurred.", { position: "top-right" });
           return;
         }
-
-        login({
-          token: result.token,
-          user: result.user,
-        });
+        toast.success("✅ Login successful! Welcome back!", { position: "top-right", autoClose: 2000 });
+        login(result);
       },
     },
   });
@@ -68,7 +73,7 @@ export const LoginForm = () => {
         />
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
           {name === "password" ? (
-            <button type="button" onClick={togglePasswordVisibility} className="text-gray-400">
+            <button type="button" onClick={togglePasswordVisibility} className="text-gray-400 focus:outline-none">
               {showPassword ? <VisibilityOff /> : <Visibility />}
             </button>
           ) : (
@@ -106,7 +111,7 @@ export const LoginForm = () => {
       <button
         type="submit"
         disabled={isLoggingIn || !formik.isValid || formik.isSubmitting}
-        className="w-full py-3 text-lg font-medium mt-6 bg-purple-500 rounded-lg text-white hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-gray-200 disabled:text-gray-400"
+        className="w-full py-3 text-lg font-medium mt-6 bg-purple-500 rounded-lg text-white hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-gray-400 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
       >
         {isLoggingIn ? (
           <div className="flex items-center justify-center gap-2">
@@ -147,7 +152,7 @@ export const LoginForm = () => {
           <Info className="h-5 w-5 text-purple-500" />
         </div>
         <div className="ml-3">
-          <p className="text-sm font-bold">
+          <p className="text-sm font-bold text-gray-600">
             Secure Login:
             <span className="font-normal"> Your credentials are encrypted and never shared.</span>
           </p>

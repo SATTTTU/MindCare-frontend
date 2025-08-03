@@ -33,7 +33,7 @@ export const MultiStepForm = ({ doctorId }) => {
     doctorId: doctorId,
     mutationConfig: {
       onSuccess: () => {
-        navigate("/therapist/application-review");
+        navigate("/application-review");
       },
       onError: (error) => {
         console.error("❌ Documents submission failed:", error);
