@@ -41,7 +41,7 @@ export const userRoutes = [
         path: paths.user.blogs.path, // e.g., '/journal'
         lazy: async () => {
           const { BlogCards } = await import(
-            "../../../modules/user/blogs/components/blog"
+            "../../../modules/user/blogs/components/BlogCards"
           );
           return { Component: BlogCards };
         },

@@ -1,9 +1,9 @@
 import React from 'react';
-import { useGetBlogs } from '@/hooks/useGetBlogs';
 import { Link } from 'react-router-dom';
 import { Sidebar } from '@/components/ui/aside';
+import { useGetBlogs } from '../api/usegetBlog';
 
-const BlogCards = () => {
+ export const BlogCards = () => {
   const { data: blogs = [], isLoading, isError } = useGetBlogs();
 
   if (isLoading) return <div className="p-6">Loading blogs...</div>;
@@ -80,4 +80,3 @@ const BlogCards = () => {
   );
 };
 
-export default BlogCards;

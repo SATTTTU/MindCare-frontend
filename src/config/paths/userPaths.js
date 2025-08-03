@@ -1,6 +1,6 @@
 export const userPaths = {
   root: {
-    path: "/",
+    path: "",
     getHref: () => "/",
   },
 
