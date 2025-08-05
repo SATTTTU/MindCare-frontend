@@ -2,14 +2,14 @@ import { api } from "@/lib/api-client";
 import { useMutation} from "@tanstack/react-query";
 
 // Get All Cooks API Call without parameters (fetch all)
-export const getAllCooks = () => {
-  return api.get('/api/admins/get-all-cooks');
+export const getAllTherapists = () => {
+  return api.get('/api/Admin/doctors');
 };
 
-export const useGetAllCooks = ({ mutationConfig } = {}) => {
+export const useGetAllTherapists = ({ mutationConfig } = {}) => {
 
   const mutation = useMutation({
-    mutationFn: getAllCooks,
+    mutationFn: getAllTherapists,
     ...mutationConfig,
   });
 

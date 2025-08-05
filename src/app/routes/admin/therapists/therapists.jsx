@@ -8,7 +8,7 @@ import CookFilters from "@/modules/admin/cook/components/cookFilter";
 import CookTable from "@/modules/admin/cook/components/cookTable";
 import { useGetAllCooks } from "@/modules/admin/cook/api/getallcooks";
 
-export const CooksRoute = () => {
+export const TherapistRoute=() => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");

@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
     const { role, doctorInfo } = userPayload;
 
     if (role.toLowerCase() === 'admin') {
-      navigate('/admin/dashboard');
+      navigate('/admin-dashboard');
       return;
     }
     
