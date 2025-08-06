@@ -1,31 +1,31 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import Pagination from "@/components/ui/pagination/pagination";
 import { FaArrowLeft } from "react-icons/fa";
-import { Sidebar } from "@/components/ui/admin/aside/aside";
-import CookFilters from "@/modules/admin/cook/components/cookFilter";
-import CookTable from "@/modules/admin/cook/components/cookTable";
-import { useGetAllCooks } from "@/modules/admin/cook/api/getallcooks";
+import { Sidebar } from "@/components/ui/aside";
+import TherapistFilter from "@/modules/admin/therapists/components/therapistsFilter";
+import { useGetAllTherapists } from "@/modules/admin/therapists/api/get-alltherapists";
+import TherapistTable from "@/modules/admin/therapists/components/therapistTable";
+import Pagination from "@/components/ui/pagination/pagination";
 
-export const TherapistRoute=() => {
+export const TherapistRoute = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [ratingFilter, setRatingFilter] = useState("all");
+  const [specializationFilter, setSpecializationFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredCooks, setFilteredCooks] = useState([]);
+  const [filteredTherapists, setFilteredTherapists] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
 
-  // Using the query hook to fetch all cooks
+  // Using the query hook to fetch all therapists
   const {
-    mutateAsync: fetchCooks,
+    mutateAsync: fetchTherapists,
     isLoading,
     isError,
     error,
     data: apiResponse
-  } = useGetAllCooks({
+  } = useGetAllTherapists({
     mutationConfig: {
       onSuccess: (response) => {
         console.log("API Response:", response);
@@ -33,62 +33,53 @@ export const TherapistRoute=() => {
     },
   });
 
-  // Extract all cooks from the API response
-  const allCooks = apiResponse?.data || [];
+  // Extract all therapists from the API response
+  const allTherapists = apiResponse?.data || [];
 
-  // Fetch cooks on initial load
+  // Fetch therapists on initial load
   useEffect(() => {
-    fetchCooks();
-  }, [fetchCooks]);
+    fetchTherapists();
+  }, [fetchTherapists]);
 
-  // Apply filters whenever filter criteria or cooks data changes
+  // Apply filters whenever filter criteria or therapists data changes
   useEffect(() => {
-    if (!allCooks.length) return;
+    if (!allTherapists.length) return;
 
-    let result = [...allCooks];
+    let result = [...allTherapists];
 
     // Apply name search filter
     if (search) {
-      result = result.filter((cook) =>
-        cook?.name?.toLowerCase().includes(search.toLowerCase())
+      result = result.filter((therapist) =>
+        therapist?.name?.toLowerCase().includes(search.toLowerCase())
       );
     }
 
-    // Apply status filter - only using approval_status
+    // Apply status filter
     if (statusFilter !== "all") {
-      result = result.filter(cook => cook.approval_status === statusFilter);
+      result = result.filter(therapist => 
+        therapist.applicationStatus?.toLowerCase() === statusFilter.toLowerCase()
+      );
     }
 
-    // Apply rating filter
-    if (ratingFilter !== "all") {
-      result = result.filter(cook => {
-        const rating = parseFloat(cook.average_rating) || 0;
-        
-        if (ratingFilter === "no-rating") {
-          return rating === 0;
-        } else if (ratingFilter === "low") {
-          return rating > 0 && rating < 3;
-        } else if (ratingFilter === "medium") {
-          return rating >= 3 && rating < 4;
-        } else if (ratingFilter === "high") {
-          return rating >= 4;
-        }
-        return true;
-      });
+    // Apply specialization filter
+    if (specializationFilter !== "all") {
+      result = result.filter(therapist => 
+        therapist.specialization?.toLowerCase().includes(specializationFilter.toLowerCase())
+      );
     }
 
-    // Update filtered cooks and pagination
-    setFilteredCooks(result);
+    // Update filtered therapists and pagination
+    setFilteredTherapists(result);
     setTotalPages(Math.ceil(result.length / itemsPerPage));
     
     // Reset to first page when filters change
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
-  }, [allCooks, search, statusFilter, ratingFilter]);
+  }, [allTherapists, search, statusFilter, specializationFilter]);
 
   // Get current page items
-  const currentCooks = filteredCooks.slice(
+  const currentTherapists = filteredTherapists.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -103,24 +94,24 @@ export const TherapistRoute=() => {
         >
           <FaArrowLeft size={20} />
         </Link>
-        <h1 className="text-3xl font-bold mb-6 text-gray-900">All Cooks</h1>
+        <h1 className="text-3xl font-bold mb-6 text-gray-900">All Therapists</h1>
         
         <div className="bg-white p-6 shadow-md rounded-lg">
-          <CookFilters
+          <TherapistFilter
             search={search}
             setSearch={setSearch}
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
-            ratingFilter={ratingFilter}
-            setRatingFilter={setRatingFilter}
+            specializationFilter={specializationFilter}
+            setSpecializationFilter={setSpecializationFilter}
           />
           {isError && (
             <div className="text-red-500 mb-4">
-              Error: {error?.message || "Failed to fetch cooks"}
+              Error: {error?.message || "Failed to fetch therapists"}
             </div>
           )}
-          <CookTable
-            cooks={currentCooks}
+          <TherapistTable
+            therapists={currentTherapists}
             navigate={navigate}
             isLoading={isLoading}
           />

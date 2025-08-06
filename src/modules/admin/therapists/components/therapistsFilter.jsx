@@ -1,12 +1,19 @@
-import React from "react";
-import Input from "@/components/ui/input/input";
+import Input from "@/components/ui/Input/input";
 import Select from "@/components/ui/Select/select";
+import React from "react";
 
-const TherapistFilter = ({ search, setSearch, statusFilter, setStatusFilter, ratingFilter, setRatingFilter }) => {
+const TherapistFilter = ({ 
+  search, 
+  setSearch, 
+  statusFilter, 
+  setStatusFilter, 
+  specializationFilter, 
+  setSpecializationFilter 
+}) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <Input
-        placeholder="Search cooks"
+        placeholder="Search therapists by name"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
@@ -14,7 +21,8 @@ const TherapistFilter = ({ search, setSearch, statusFilter, setStatusFilter, rat
         options={[
           { label: "All Status", value: "all" },
           { label: "Approved", value: "approved" },
-          { label: "Under Review", value: "under-review" },
+          { label: "Pending", value: "pending" },
+          { label: "Under Review", value: "under review" },
           { label: "Rejected", value: "rejected" }
         ]}
         value={statusFilter}
@@ -22,14 +30,17 @@ const TherapistFilter = ({ search, setSearch, statusFilter, setStatusFilter, rat
       />
       <Select
         options={[
-          { label: "All Ratings", value: "all" },
-          { label: "No Rating", value: "no-rating" },
-          { label: "Less than 3 stars", value: "low" },
-          { label: "3 to 4 stars", value: "medium" },
-          { label: "4+ stars", value: "high" },
+          { label: "All Specializations", value: "all" },
+          { label: "Clinical Psychology", value: "clinical psychology" },
+          { label: "Counseling Psychology", value: "counseling psychology" },
+          { label: "Cognitive Behavioral Therapy", value: "cognitive behavioral therapy" },
+          { label: "Family Therapy", value: "family therapy" },
+          { label: "Marriage Counseling", value: "marriage counseling" },
+          { label: "Child Psychology", value: "child psychology" },
+          { label: "Addiction Counseling", value: "addiction counseling" },
         ]}
-        value={ratingFilter}
-        onChange={(e) => setRatingFilter(e.target.value)}
+        value={specializationFilter}
+        onChange={(e) => setSpecializationFilter(e.target.value)}
       />
     </div>
   );
