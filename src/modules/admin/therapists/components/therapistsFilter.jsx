@@ -1,6 +1,6 @@
+import React from "react";
 import Input from "@/components/ui/Input/input";
 import Select from "@/components/ui/Select/select";
-import React from "react";
 
 const TherapistFilter = ({ 
   search, 
@@ -20,10 +20,10 @@ const TherapistFilter = ({
       <Select
         options={[
           { label: "All Status", value: "all" },
-          { label: "Approved", value: "approved" },
           { label: "Pending", value: "pending" },
-          { label: "Under Review", value: "under review" },
-          { label: "Rejected", value: "rejected" }
+          { label: "Approved", value: "approved" },
+          { label: "Rejected", value: "rejected" },
+          { label: "Unknown/Empty", value: "unknown" }
         ]}
         value={statusFilter}
         onChange={(e) => setStatusFilter(e.target.value)}

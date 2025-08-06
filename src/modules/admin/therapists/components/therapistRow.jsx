@@ -16,19 +16,24 @@ const TherapistRow = ({ therapist, navigate }) => {
   let statusClass = "bg-gray-100 text-gray-800";
 
   // Handle application status
-  if (applicationStatus?.toLowerCase() === "approved") {
+  const status = applicationStatus?.toLowerCase().trim();
+  
+  if (status === "approved") {
     statusText = "Approved";
     statusClass = "bg-green-100 text-green-800";
-  } else if (applicationStatus?.toLowerCase() === "pending") {
+  } else if (status === "pending") {
     statusText = "Pending";
     statusClass = "bg-yellow-100 text-yellow-800";
-  } else if (applicationStatus?.toLowerCase() === "under review") {
+  } else if (status === "under review") {
     statusText = "Under Review";
     statusClass = "bg-blue-100 text-blue-800";
-  } else if (applicationStatus?.toLowerCase() === "rejected") {
+  } else if (status === "rejected") {
     statusText = "Rejected";
     statusClass = "bg-red-100 text-red-800";
-  } else if (applicationStatus) {
+  } else if (!status || status === "") {
+    statusText = "Unknown";
+    statusClass = "bg-gray-100 text-gray-800";
+  } else {
     statusText = applicationStatus;
     statusClass = "bg-gray-100 text-gray-800";
   }

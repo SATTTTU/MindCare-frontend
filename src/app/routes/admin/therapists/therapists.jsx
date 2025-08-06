@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { FaArrowLeft } from "react-icons/fa";
+import { useGetAllTherapists } from "@/modules/admin/therapists/api/get-alltherapists";
 import { Sidebar } from "@/components/ui/aside";
 import TherapistFilter from "@/modules/admin/therapists/components/therapistsFilter";
-import { useGetAllTherapists } from "@/modules/admin/therapists/api/get-alltherapists";
 import TherapistTable from "@/modules/admin/therapists/components/therapistTable";
 import Pagination from "@/components/ui/pagination/pagination";
+
 
 export const TherapistRoute = () => {
   const navigate = useNavigate();
@@ -34,7 +35,8 @@ export const TherapistRoute = () => {
   });
 
   // Extract all therapists from the API response
-  const allTherapists = apiResponse?.data || [];
+  // API returns array directly, not wrapped in data property
+  const allTherapists = Array.isArray(apiResponse) ? apiResponse : (apiResponse?.data || []);
 
   // Fetch therapists on initial load
   useEffect(() => {
@@ -56,9 +58,17 @@ export const TherapistRoute = () => {
 
     // Apply status filter
     if (statusFilter !== "all") {
-      result = result.filter(therapist => 
-        therapist.applicationStatus?.toLowerCase() === statusFilter.toLowerCase()
-      );
+      result = result.filter(therapist => {
+        const status = therapist.applicationStatus?.toLowerCase().trim();
+        const filterValue = statusFilter.toLowerCase();
+        
+        // Handle empty status as "pending" or "unknown"
+        if (!status || status === "") {
+          return filterValue === "pending" || filterValue === "unknown";
+        }
+        
+        return status === filterValue;
+      });
     }
 
     // Apply specialization filter
