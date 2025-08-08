@@ -1,14 +1,14 @@
 import { api } from "@/lib/api-client";
 import { useMutation } from "@tanstack/react-query";
 
-export const VerifyCook = (cookId, params) => {
-  console.log(`Making verify request to /api/admins/verify-cook/${cookId} with params:`, params);
-  return api.put(`/api/admins/verify-cook/${cookId}`, params);
+export const verifyTherapist = (therapistId, params) => {
+  console.log(`Making verify request to /api/admins/verify-cook/${therapistId} with params:`, params);
+  return api.put(`/api/admins/verify-cook/${therapistId}`, params);
 };
 
-export const useVerifyCook = (cookId, { mutationConfig } = {}) => {
+export const useVerifyTherapist = (therapistId, { mutationConfig } = {}) => {
   const mutation = useMutation({
-    mutationFn: (params) => VerifyCook(cookId, params),
+    mutationFn: (params) => verifyTherapist(therapistId, params),
     ...mutationConfig,
   });
   
