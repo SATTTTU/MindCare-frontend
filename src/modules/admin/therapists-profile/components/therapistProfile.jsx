@@ -1,3 +1,4 @@
+import React, { useState, useMemo } from 'react';
 import {
   Calendar,
   CheckCircle,
@@ -5,12 +6,30 @@ import {
   ArrowLeft,
   FileText,
   Eye,
-} from "react-feather";
-import { useState, useMemo } from "react";
+  User,
+  Phone,
+  Mail,
+  Award,
+  Clock,
+  Download,
+  X,
+  Trash2,
+  UserCheck,
+  UserX,
+  RefreshCw
+} from 'lucide-react';
 import { toast } from "react-toastify";
+import { usegetDocuments } from "../api/getDocuments";
 import { useVerifyTherapist } from "../api/verify-cook";
 import { useDeleteTherapist } from "../api/useDeleteTherapist";
-import { usegetDocuments } from "../api/getDocuments";
+import { useGetAllTherapists } from "../api/useSingleTherapist";
+
+const documentConfig = [
+  { key: "PasswordSizedPhoto", label: "Passport Size Photo", icon: User },
+  { key: "CitizenshipFront", label: "Citizenship Front", icon: FileText },
+  { key: "CitizenshipBack", label: "Citizenship Back", icon: FileText },
+  { key: "Certificate", label: "Certificates", icon: Award },
+];
 
 const getFullImageUrl = (path) => {
   const baseUrl = import.meta.env.VITE_APP_API_URL;
@@ -19,280 +38,434 @@ const getFullImageUrl = (path) => {
   return `${baseUrl}${path}`;
 };
 
-const documentConfig = [
-  { key: "PasswordSizedPhoto", label: "Passport Size Photo", modalKey: "passportPhoto" },
-  { key: "CitizenshipFront", label: "Citizenship Front", modalKey: "citizenshipFront" },
-  { key: "CitizenshipBack", label: "Citizenship Back", modalKey: "citizenshipBack" },
-  { key: "Certificate", label: "Certificates", modalKey: "certificate" },
-];
-
 const TherapistProfileDetails = ({ therapistId, navigate, onStatusChange }) => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [deleteNote, setDeleteNote] = useState("");
   const [showDocumentModal, setShowDocumentModal] = useState(null);
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [deleteError, setDeleteError] = useState(null);
 
-  // Fetch therapist's documents
-  const { isError, isLoading, data: documents } = usegetDocuments(therapistId);
+  const {
+    data: allTherapistsData,
+    isLoading: isLoadingTherapists,
+    isError: isErrorTherapists,
+    error: errorTherapists,
+  } = useGetAllTherapists();
+
+  const therapistData = useMemo(() => {
+    return allTherapistsData?.find((t) => t.id == therapistId) || null;
+  }, [allTherapistsData, therapistId]);
+
+  const {
+    data: documentsData,
+    isLoading: isLoadingDocs,
+    isError: isErrorDocs,
+  } = usegetDocuments(therapistId);
 
   const latestDocuments = useMemo(() => {
-    if (!documents) return {};
+    if (!documentsData) return {};
     const latest = {};
-    for (const doc of documents) {
+    for (const doc of documentsData) {
       if (!latest[doc.documentType] || doc.id > latest[doc.documentType].id) {
         latest[doc.documentType] = doc;
       }
     }
     return latest;
-  }, [documents]);
+  }, [documentsData]);
 
-  const therapist = useMemo(() => {
-    if (!documents || documents.length === 0) return null;
+ const { mutateAsync: verifyTherapist, isLoading: isVerifying } = useVerifyTherapist(therapistId, {
+  // No more 'mutationConfig' wrapper!
+  onSuccess: () => {
+    toast.success("Therapist verified successfully");
+    onStatusChange?.(therapistId, "Verified");
+  },
+  onError: () => toast.error("Failed to verify therapist"),
+});
 
-    const mappedDocs = documentConfig.reduce((acc, doc) => {
-      const docData = latestDocuments[doc.key];
-      acc[doc.modalKey] = getFullImageUrl(docData?.filePath);
-      return acc;
-    }, {});
+const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapist(therapistId, {
+  onSuccess: () => {
+    toast.success("Therapist deleted successfully");
+    setShowConfirmDelete(false);
+    navigate("/admin/therapists");
+  },
+  onError: (error) => {
+    // Pass the error message to the toast for better feedback
+    toast.error(error?.message || "Failed to delete therapist");
+    setDeleteError(error); // You have state for this, so let's use it
+  },
+});
 
-    const baseData = documents[0] || {};
 
-    return {
-      id: baseData.doctorId || therapistId,
-      name: baseData.doctorName || "Unknown",
-      email: baseData.email || "N/A",
-      phone: baseData.phone || "N/A",
-      image:
-        getFullImageUrl(latestDocuments.PasswordSizedPhoto?.filePath) ||
-        "https://via.placeholder.com/150",
-      status: mapApprovalStatusToDisplay(baseData.status),
-      joinedDate: baseData.joinedDate || new Date().toISOString(),
-      documents: mappedDocs,
-    };
-  }, [documents, latestDocuments, therapistId]);
 
-  function mapApprovalStatusToDisplay(status) {
-    switch (status) {
-      case "approved":
-        return "Verified";
-      case "under-review":
-        return "Pending";
-      case "rejected":
-        return "Unverified";
-      default:
-        return "Pending";
+  const handleDelete = async () => {
+    setDeleteError(null);
+    try {
+      await deleteTherapist({ note: deleteNote });
+    } catch (error) {
+      // Error handled in onError above
     }
-  }
-
-  const statusColor = {
-    Verified: "green",
-    Pending: "yellow",
-    Unverified: "red",
   };
 
-  const { mutateAsync: verifyTherapist, isLoading: isVerifying } = useVerifyTherapist(
-    therapistId,
-    {
-      mutationConfig: {
-        onSuccess: () => {
-          toast.success("Therapist verified successfully");
-          onStatusChange?.(therapistId, "Verified");
-        },
-        onError: () => toast.error("Failed to verify therapist"),
-      },
+  const mapApplicationStatus = (status) => {
+    switch ((status || "").toLowerCase()) {
+      case "approved":
+        return { label: "Verified", color: "green", icon: CheckCircle };
+      case "pending review":
+      case "pending":
+        return { label: "Pending Review", color: "yellow", icon: Clock };
+      case "rejected":
+        return { label: "Rejected", color: "red", icon: AlertCircle };
+      default:
+        return { label: "Under Review", color: "blue", icon: RefreshCw };
     }
-  );
+  };
 
-  const {
-    mutateAsync: deleteTherapist,
-    isLoading: isDeleting,
-    error: deleteError,
-  } = useDeleteTherapist(therapistId, {
-    mutationConfig: {
-      onSuccess: () => {
-        toast.success("Therapist deleted successfully");
-        setShowConfirmDelete(false);
-        navigate("/admin/therapists");
-      },
-      onError: () => toast.error("Failed to delete therapist"),
-    },
-  });
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(new Date(dateString));
+  };
 
-  const formatDate = (date) =>
-    new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }).format(new Date(date));
-
-  const handleVerifyStatus = async (newStatus) => {
+  const handleStatusChange = async (newStatus) => {
     const approval_status = newStatus === "Verified" ? "approved" : "rejected";
     await verifyTherapist({ approval_status });
   };
 
-  if (isLoading) return <div className="p-4">Loading therapist details...</div>;
-  if (isError) return <div className="p-4 text-red-600">Error loading data</div>;
-  if (!therapist) return <div className="p-4">No data found</div>;
+  const openDocumentModal = (docType) => {
+    const document = latestDocuments[docType];
+    if (document) {
+      setSelectedDocument(document);
+      setShowDocumentModal(docType);
+    }
+  };
 
-  return (
-    <div className="max-w-4xl mx-auto">
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center mb-4 text-gray-600 hover:text-gray-800"
-      >
-        <ArrowLeft size={18} className="mr-2" /> Back
-      </button>
-
-      {/* Profile Card */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <div className="flex items-center">
-          <img
-            src={therapist.image}
-            alt={therapist.name}
-            className="w-20 h-20 rounded-full object-cover mr-4"
-          />
-          <div>
-            <h2 className="font-bold text-xl">{therapist.name}</h2>
-            <span
-              className={`inline-flex items-center px-2 py-1 text-xs rounded-full bg-${statusColor[therapist.status]}-100 text-${statusColor[therapist.status]}-800`}
-            >
-              {therapist.status === "Verified" ? (
-                <CheckCircle size={14} className="mr-1" />
-              ) : (
-                <AlertCircle size={14} className="mr-1" />
-              )}
-              {therapist.status}
-            </span>
-            <div className="text-gray-500 text-sm mt-2 flex items-center">
-              <Calendar size={14} className="mr-1" />
-              Joined {formatDate(therapist.joinedDate)}
-            </div>
-          </div>
+  if (isLoadingTherapists || isLoadingDocs) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="animate-spin h-8 w-8 text-blue-500 mx-auto mb-4" />
+          <p className="text-gray-600">Loading therapist details...</p>
         </div>
       </div>
+    );
+  }
 
-      {/* Buttons: Conditional rendering */}
-      <div className="mt-4 flex space-x-2">
-        {therapist.status !== "Verified" && (
-          <button
-            disabled={isVerifying}
-            onClick={() => handleVerifyStatus("Verified")}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-          >
-            {isVerifying ? "Verifying..." : "Verify"}
-          </button>
-        )}
-
-        {therapist.status !== "Unverified" && (
-          <button
-            disabled={isVerifying}
-            onClick={() => handleVerifyStatus("Unverified")}
-            className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 disabled:opacity-50"
-          >
-            {isVerifying ? "Processing..." : "Reject"}
-          </button>
-        )}
-
-        <button
-          disabled={isDeleting}
-          onClick={() => setShowConfirmDelete(true)}
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-        >
-          Delete
-        </button>
+  if (isErrorTherapists || isErrorDocs) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600">Error loading data</p>
+          <p className="text-gray-500 text-sm mt-2">
+            {errorTherapists?.message || "Please try again later"}
+          </p>
+        </div>
       </div>
+    );
+  }
 
-      {/* Document Section */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 className="text-lg font-semibold flex items-center mb-4">
-          <FileText size={18} className="mr-2 text-blue-500" /> Verification Documents
-        </h3>
-        <div className="grid grid-flow-col auto-cols-max gap-4 overflow-x-auto pb-2">
-          {documentConfig.map((doc) => {
-            const imageUrl = therapist.documents[doc.modalKey];
-            if (!imageUrl) return null;
-            return (
-              <div
-                key={doc.key}
-                className="border rounded-lg w-48 flex-shrink-0 overflow-hidden"
-              >
-                <div className="p-2 bg-gray-50 border-b">
-                  <p className="text-xs text-gray-500">{doc.label}</p>
-                </div>
-                <div className="relative group">
+  if (!therapistData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <User className="h-8 w-8 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600">No therapist data found</p>
+        </div>
+      </div>
+    );
+  }
+
+  const statusInfo = mapApplicationStatus(therapistData.applicationStatus || therapistData.specialization);
+  const StatusIcon = statusInfo.icon;
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            <ArrowLeft size={20} className="mr-2" />
+            <span className="font-medium">Back to Therapists</span>
+          </button>
+
+          <div className="flex space-x-3">
+            {statusInfo.label !== "Verified" && (
+              <>
+                <button
+                  onClick={() => handleStatusChange("Verified")}
+                  disabled={isVerifying}
+                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                >
+                  <UserCheck size={16} className="mr-2" />
+                  {isVerifying ? "Processing..." : "Approve"}
+                </button>
+                <button
+                  onClick={() => handleStatusChange("Rejected")}
+                  disabled={isVerifying}
+                  className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  <UserX size={16} className="mr-2" />
+                  {isVerifying ? "Processing..." : "Reject"}
+                </button>
+              </>
+            )}
+            <button
+              onClick={() => setShowConfirmDelete(true)}
+              disabled={isDeleting}
+              className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            >
+              <Trash2 size={16} className="mr-2" />
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6 text-center">
+                <div className="relative inline-block mb-4">
                   <img
-                    src={imageUrl}
-                    alt={doc.label}
-                    className="w-full h-32 object-cover"
+                    src={getFullImageUrl(latestDocuments.PasswordSizedPhoto?.filePath) || "https://via.placeholder.com/150"}
+                    alt={therapistData.name}
+                    className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <button
-                      onClick={() => setShowDocumentModal(doc.modalKey)}
-                      className="p-2 bg-white rounded-full"
-                    >
-                      <Eye size={18} />
-                    </button>
+                  <div className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-${statusInfo.color}-100 border-2 border-white flex items-center justify-center`}>
+                    <StatusIcon size={14} className={`text-${statusInfo.color}-600`} />
+                  </div>
+                </div>
+
+                <h1 className="text-xl font-bold text-gray-900 mb-1">
+                  {therapistData.name || "N/A"}
+                </h1>
+
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-${statusInfo.color}-100 text-${statusInfo.color}-800 mb-4`}>
+                  {statusInfo.label}
+                </span>
+
+                <div className="space-y-3 text-sm text-gray-600">
+                  <div className="flex items-center justify-center">
+                    <Award size={16} className="mr-2 text-blue-500" />
+                    <span>{therapistData.specialization || "N/A"}</span>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <Phone size={16} className="mr-2 text-green-500" />
+                    <span>{therapistData.contactInfo || "N/A"}</span>
+                  </div>
+                  {therapistData.email && (
+                    <div className="flex items-center justify-center">
+                      <Mail size={16} className="mr-2 text-purple-500" />
+                      <span>{therapistData.email}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-center">
+                    <Calendar size={16} className="mr-2 text-orange-500" />
+                    <span>User ID: {therapistData.userId}</span>
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
+            </div>
+          </div>
 
-      {/* Delete Confirmation Modal */}
-      {showConfirmDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">Confirm Delete</h3>
-            <p className="mb-6">Are you sure you want to delete this therapist?</p>
-            {deleteError && (
-              <div className="mb-4 p-2 bg-red-100 text-red-600">
-                {deleteError.message}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                  <FileText size={20} className="mr-2 text-blue-500" />
+                  Verification Documents
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Review and manage submitted documents
+                </p>
               </div>
-            )}
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowConfirmDelete(false)}
-                className="px-4 py-2 bg-gray-100 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={deleteTherapist}
-                disabled={isDeleting}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-              >
-                {isDeleting ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Document Viewer Modal */}
-      {showDocumentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-4 max-w-3xl w-full">
-            <div className="flex justify-between mb-4">
-              <h3 className="text-lg font-bold">
-                {documentConfig.find((d) => d.modalKey === showDocumentModal)?.label}
-              </h3>
-              <button
-                onClick={() => setShowDocumentModal(null)}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="flex justify-center">
-              <img
-                src={therapist.documents?.[showDocumentModal]}
-                alt={showDocumentModal}
-                className="max-h-[80vh] object-contain"
-              />
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {documentConfig.map((docConfig) => {
+                    const document = latestDocuments[docConfig.key];
+                    const DocIcon = docConfig.icon;
+
+                    return (
+                      <div
+                        key={docConfig.key}
+                        className={`relative group border-2 rounded-lg overflow-hidden transition-all ${
+                          document
+                            ? document.status === 'Approved'
+                              ? 'border-green-200 bg-green-50'
+                              : 'border-yellow-200 bg-yellow-50'
+                            : 'border-gray-200 bg-gray-50 border-dashed'
+                        }`}
+                      >
+                        {document ? (
+                          <>
+                            <div className="aspect-video relative overflow-hidden">
+                              <img
+                                src={getFullImageUrl(document.filePath)}
+                                alt={docConfig.label}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center">
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
+                                  <button
+                                    onClick={() => openDocumentModal(docConfig.key)}
+                                    className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                                  >
+                                    <Eye size={16} className="text-gray-700" />
+                                  </button>
+                                  <button
+                                    onClick={() => window.open(getFullImageUrl(document.filePath), '_blank')}
+                                    className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                                  >
+                                    <Download size={16} className="text-gray-700" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="p-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                  <DocIcon size={16} className="mr-2 text-gray-600" />
+                                  <span className="font-medium text-sm text-gray-900">
+                                    {docConfig.label}
+                                  </span>
+                                </div>
+                                <span className={`text-xs px-2 py-1 rounded-full ${
+                                  document.status === 'Approved'
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-yellow-100 text-yellow-700'
+                                }`}>
+                                  {document.status || 'Pending'}
+                                </span>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1">
+                                Uploaded by: {document.doctorName}
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="aspect-video flex flex-col items-center justify-center p-4">
+                            <DocIcon size={32} className="text-gray-400 mb-2" />
+                            <span className="text-sm text-gray-500 text-center">
+                              {docConfig.label}
+                            </span>
+                            <span className="text-xs text-gray-400 mt-1">
+                              Not uploaded
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      )}
+
+        {/* Delete Confirmation Modal */}
+        {showConfirmDelete && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+              <div className="p-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mr-4">
+                    <AlertCircle size={24} className="text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Confirm Deletion
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      This action cannot be undone
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-gray-700 mb-4">
+                  Are you sure you want to delete <strong>{therapistData.name}</strong>? 
+                  This will permanently remove their profile and all associated documents.
+                </p>
+
+                <div className="mb-4">
+                  <label htmlFor="delete-note" className="block text-sm font-medium text-gray-700 mb-1">
+                    Reason for deletion (optional)
+                  </label>
+                  <textarea
+                    id="delete-note"
+                    rows={3}
+                    value={deleteNote}
+                    onChange={(e) => setDeleteNote(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                    placeholder="Add a note or reason for deleting this therapist..."
+                  />
+                </div>
+
+                {deleteError && (
+                  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                    {deleteError.message || "An error occurred"}
+                  </div>
+                )}
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowConfirmDelete(false)}
+                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                  >
+                    {isDeleting ? "Deleting..." : "Delete Therapist"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Document View Modal */}
+        {showDocumentModal && selectedDocument && (
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {documentConfig.find(d => d.key === showDocumentModal)?.label}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Status: {selectedDocument.status || 'Pending'} | Uploaded by: {selectedDocument.doctorName}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowDocumentModal(null);
+                    setSelectedDocument(null);
+                  }}
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="flex-grow overflow-auto p-4">
+                <img
+                  src={getFullImageUrl(selectedDocument.filePath)}
+                  alt={selectedDocument.documentType}
+                  className="w-full max-h-[80vh] object-contain rounded-lg"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
