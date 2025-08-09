@@ -1,3 +1,5 @@
+// File Path: src/components/TherapistProfileDetails.jsx
+
 import React, { useState, useMemo } from 'react';
 import {
   Calendar,
@@ -13,15 +15,16 @@ import {
   Clock,
   Download,
   X,
-  Trash2,
   UserCheck,
   UserX,
   RefreshCw
 } from 'lucide-react';
 import { toast } from "react-toastify";
+
+// Import the hooks for data fetching and mutations
 import { usegetDocuments } from "../api/getDocuments";
 import { useVerifyTherapist } from "../api/verify-cook";
-import { useDeleteTherapist } from "../api/useDeleteTherapist";
+import { useDeleteTherapist } from "../api/useDeleteTherapist"; // This hook handles rejection
 import { useGetAllTherapists } from "../api/useSingleTherapist";
 
 const documentConfig = [
@@ -31,6 +34,7 @@ const documentConfig = [
   { key: "Certificate", label: "Certificates", icon: Award },
 ];
 
+// Helper to construct full image URLs
 const getFullImageUrl = (path) => {
   const baseUrl = import.meta.env.VITE_APP_API_URL;
   if (!path) return null;
@@ -39,12 +43,16 @@ const getFullImageUrl = (path) => {
 };
 
 const TherapistProfileDetails = ({ therapistId, navigate, onStatusChange }) => {
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [deleteNote, setDeleteNote] = useState("");
+  // State for the rejection modal and its inputs
+  const [showConfirmReject, setShowConfirmReject] = useState(false);
+  const [rejectionNote, setRejectionNote] = useState("");
+  const [rejectionError, setRejectionError] = useState(null);
+
+  // State for the document viewer modal
   const [showDocumentModal, setShowDocumentModal] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
-  const [deleteError, setDeleteError] = useState(null);
 
+  // Fetching all therapists to find the one we need
   const {
     data: allTherapistsData,
     isLoading: isLoadingTherapists,
@@ -52,16 +60,19 @@ const TherapistProfileDetails = ({ therapistId, navigate, onStatusChange }) => {
     error: errorTherapists,
   } = useGetAllTherapists();
 
+  // Memoized derivation of the specific therapist's data
   const therapistData = useMemo(() => {
     return allTherapistsData?.find((t) => t.id == therapistId) || null;
   }, [allTherapistsData, therapistId]);
 
+  // Fetching documents for this therapist
   const {
     data: documentsData,
     isLoading: isLoadingDocs,
     isError: isErrorDocs,
   } = usegetDocuments(therapistId);
 
+  // Memoized derivation of the latest version of each document type
   const latestDocuments = useMemo(() => {
     if (!documentsData) return {};
     const latest = {};
@@ -73,39 +84,45 @@ const TherapistProfileDetails = ({ therapistId, navigate, onStatusChange }) => {
     return latest;
   }, [documentsData]);
 
- const { mutateAsync: verifyTherapist, isLoading: isVerifying } = useVerifyTherapist(therapistId, {
-  // No more 'mutationConfig' wrapper!
-  onSuccess: () => {
-    toast.success("Therapist verified successfully");
-    onStatusChange?.(therapistId, "Verified");
-  },
-  onError: () => toast.error("Failed to verify therapist"),
-});
+  // Hook for the "Approve" action
+  const { mutateAsync: verifyTherapist, isLoading: isVerifying } = useVerifyTherapist(therapistId, {
+    onSuccess: () => {
+      toast.success("Therapist verified successfully");
+      onStatusChange?.(therapistId, "Verified");
+    },
+    onError: () => toast.error("Failed to verify therapist"),
+  });
 
-const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapist(therapistId, {
-  onSuccess: () => {
-    toast.success("Therapist deleted successfully");
-    setShowConfirmDelete(false);
-    navigate("/admin/therapists");
-  },
-  onError: (error) => {
-    // Pass the error message to the toast for better feedback
-    toast.error(error?.message || "Failed to delete therapist");
-    setDeleteError(error); // You have state for this, so let's use it
-  },
-});
+  // Hook for the "Reject" action
+  const { mutateAsync: rejectTherapist, isLoading: isRejecting } = useDeleteTherapist(therapistId, {
+    onSuccess: () => {
+      toast.success("Therapist rejected successfully");
+      setShowConfirmReject(false);
+      navigate("/admin/therapists");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to reject therapist");
+      setRejectionError(error);
+    },
+  });
 
-
-
-  const handleDelete = async () => {
-    setDeleteError(null);
-    try {
-      await deleteTherapist({ note: deleteNote });
-    } catch (error) {
-      // Error handled in onError above
+  // Handler for the reject button in the modal
+  const handleReject = async () => {
+    // Basic validation to ensure a reason is given
+    if (!rejectionNote || rejectionNote.trim() === "") {
+        toast.warn("A reason for rejection is required.");
+        return;
     }
+    setRejectionError(null);
+    await rejectTherapist({ Notes: rejectionNote });
+  };
+  
+  // Handler for the approve button
+  const handleApprove = async () => {
+    await verifyTherapist({ approval_status: "approved" });
   };
 
+  // Maps backend status to UI-friendly labels, colors, and icons
   const mapApplicationStatus = (status) => {
     switch ((status || "").toLowerCase()) {
       case "approved":
@@ -120,20 +137,7 @@ const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapi
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(new Date(dateString));
-  };
-
-  const handleStatusChange = async (newStatus) => {
-    const approval_status = newStatus === "Verified" ? "approved" : "rejected";
-    await verifyTherapist({ approval_status });
-  };
-
+  // Opens the modal to view a specific document
   const openDocumentModal = (docType) => {
     const document = latestDocuments[docType];
     if (document) {
@@ -142,6 +146,7 @@ const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapi
     }
   };
 
+  // Loading state
   if (isLoadingTherapists || isLoadingDocs) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -153,6 +158,7 @@ const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapi
     );
   }
 
+  // Error state
   if (isErrorTherapists || isErrorDocs) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -167,12 +173,13 @@ const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapi
     );
   }
 
+  // No data found state
   if (!therapistData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <User className="h-8 w-8 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600">No therapist data found</p>
+          <p className="text-gray-600">No therapist data found for this ID.</p>
         </div>
       </div>
     );
@@ -190,38 +197,30 @@ const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapi
             className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
           >
             <ArrowLeft size={20} className="mr-2" />
-            <span className="font-medium">Back to Therapists</span>
+            <span className="font-medium cursor-pointer">Back to Therapists</span>
           </button>
 
           <div className="flex space-x-3">
-            {statusInfo.label !== "Verified" && (
+            {statusInfo.label !== "Verified" && statusInfo.label !== "Rejected" && (
               <>
                 <button
-                  onClick={() => handleStatusChange("Verified")}
-                  disabled={isVerifying}
+                  onClick={handleApprove}
+                  disabled={isVerifying || isRejecting}
                   className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
                 >
                   <UserCheck size={16} className="mr-2" />
-                  {isVerifying ? "Processing..." : "Approve"}
+                  {isVerifying ? "Approving..." : "Approve"}
                 </button>
                 <button
-                  onClick={() => handleStatusChange("Rejected")}
-                  disabled={isVerifying}
+                  onClick={() => setShowConfirmReject(true)}
+                  disabled={isRejecting || isVerifying}
                   className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
                 >
                   <UserX size={16} className="mr-2" />
-                  {isVerifying ? "Processing..." : "Reject"}
+                  Reject
                 </button>
               </>
             )}
-            <button
-              onClick={() => setShowConfirmDelete(true)}
-              disabled={isDeleting}
-              className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
-            >
-              <Trash2 size={16} className="mr-2" />
-              Delete
-            </button>
           </div>
         </div>
 
@@ -303,7 +302,7 @@ const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapi
                       >
                         {document ? (
                           <>
-                            <div className="aspect-video relative overflow-hidden">
+                            <div className="aspect-video relative overflow-hidden ">
                               <img
                                 src={getFullImageUrl(document.filePath)}
                                 alt={docConfig.label}
@@ -313,13 +312,13 @@ const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapi
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
                                   <button
                                     onClick={() => openDocumentModal(docConfig.key)}
-                                    className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                                    className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
                                   >
                                     <Eye size={16} className="text-gray-700" />
                                   </button>
                                   <button
                                     onClick={() => window.open(getFullImageUrl(document.filePath), '_blank')}
-                                    className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                                    className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
                                   >
                                     <Download size={16} className="text-gray-700" />
                                   </button>
@@ -368,8 +367,8 @@ const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapi
           </div>
         </div>
 
-        {/* Delete Confirmation Modal */}
-        {showConfirmDelete && (
+        {/* Rejection Confirmation Modal */}
+        {showConfirmReject && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
               <div className="p-6">
@@ -378,53 +377,38 @@ const { mutateAsync: deleteTherapist, isLoading: isDeleting } = useDeleteTherapi
                     <AlertCircle size={24} className="text-red-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Confirm Deletion
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      This action cannot be undone
-                    </p>
+                    <h3 className="text-lg font-semibold text-gray-900">Confirm Rejection</h3>
+                    <p className="text-sm text-gray-600">This will update the therapist's status to 'Rejected'.</p>
                   </div>
                 </div>
-
-                <p className="text-gray-700 mb-4">
-                  Are you sure you want to delete <strong>{therapistData.name}</strong>? 
-                  This will permanently remove their profile and all associated documents.
-                </p>
-
+                <p className="text-gray-700 mb-4">Are you sure you want to reject <strong>{therapistData.name}</strong>?</p>
                 <div className="mb-4">
-                  <label htmlFor="delete-note" className="block text-sm font-medium text-gray-700 mb-1">
-                    Reason for deletion (optional)
-                  </label>
+                  <label htmlFor="reject-note" className="block text-sm font-medium text-gray-700 mb-1">Reason for rejection <span className="text-red-500">*</span></label>
                   <textarea
-                    id="delete-note"
+                    id="reject-note"
                     rows={3}
-                    value={deleteNote}
-                    onChange={(e) => setDeleteNote(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md p-2 text-sm"
-                    placeholder="Add a note or reason for deleting this therapist..."
+                    value={rejectionNote}
+                    onChange={(e) => setRejectionNote(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Provide a reason for rejecting this therapist..."
                   />
                 </div>
-
-                {deleteError && (
-                  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
-                    {deleteError.message || "An error occurred"}
-                  </div>
+                {rejectionError && (
+                  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">{rejectionError.message || "An error occurred"}</div>
                 )}
-
                 <div className="flex justify-end space-x-3">
                   <button
-                    onClick={() => setShowConfirmDelete(false)}
+                    onClick={() => setShowConfirmReject(false)}
                     className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={handleDelete}
-                    disabled={isDeleting}
+                    onClick={handleReject}
+                    disabled={isRejecting}
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
                   >
-                    {isDeleting ? "Deleting..." : "Delete Therapist"}
+                    {isRejecting ? "Rejecting..." : "Reject Therapist"}
                   </button>
                 </div>
               </div>

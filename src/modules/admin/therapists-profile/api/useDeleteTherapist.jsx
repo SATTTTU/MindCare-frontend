@@ -1,46 +1,48 @@
+// File Path: src/api/useDeleteTherapist.js
+
 import { api } from '@/lib/api-client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-// The API function that performs the patch/delete request
-export const deleteTherapist = (therapistId, data) => {
-  // This endpoint seems to reject a doctor, which can be considered a "soft delete".
-  return api.patch(`/api/Admin/doctors/${therapistId}/reject`, data || {}, {
+// API function to reject a therapist.
+export const rejectTherapistAPI = (therapistId, data) => {
+  // This function sends the PATCH request to your backend's reject endpoint.
+  // It requires a `Notes` field in the data payload.
+  return api.patch(`/api/Admin/doctors/${therapistId}/reject`, data, {
     headers: { 'Content-Type': 'application/json' },
   });
 };
 
-// THE CORRECTED CUSTOM HOOK
+// Custom hook to provide the rejection functionality to components.
 export const useDeleteTherapist = (therapistId, options = {}) => {
   const queryClient = useQueryClient();
 
-  // Destructure any callbacks from the options object
+  // Destructure callbacks from the options object to enhance them.
   const { onSuccess, onError, ...restOptions } = options;
 
   const mutation = useMutation({
-    // 1. Pass the mutation function
-    mutationFn: (data) => deleteTherapist(therapistId, data),
+    // The function that will be called when the mutation is triggered.
+    mutationFn: (data) => rejectTherapistAPI(therapistId, data),
 
-    // 2. Spread the rest of the options
+    // Spread the rest of the options passed in from the component.
     ...restOptions,
 
-    // 3. Create an enhanced onSuccess to handle query invalidation
+    // Enhance the onSuccess callback to automatically refetch data.
     onSuccess: (data, variables, context) => {
-      // Always invalidate queries first to trigger a refetch
+      // Invalidate queries to update the UI with the new "Rejected" status.
+      // This tells React Query that the data for these keys is stale and needs refetching.
       queryClient.invalidateQueries({ queryKey: ['therapists'] });
       queryClient.invalidateQueries({ queryKey: ['therapist', therapistId] });
       queryClient.invalidateQueries({ queryKey: ['documents', therapistId] });
 
-      // If the component provided an onSuccess callback, call it
+      // Call the original onSuccess callback from the component (e.g., to show a toast).
       if (onSuccess) {
         onSuccess(data, variables, context);
       }
     },
 
-    // 4. (Optional but good practice) Enhance onError
+    // Enhance the onError callback for better debugging.
     onError: (error, variables, context) => {
-      console.error("Failed to delete therapist:", error);
-
-      // If the component provided an onError callback, call it
+      console.error("Failed to reject therapist:", error);
       if (onError) {
         onError(error, variables, context);
       }
@@ -48,10 +50,9 @@ export const useDeleteTherapist = (therapistId, options = {}) => {
   });
 
   return {
+    // We export `mutateAsync` as `rejectTherapist` for clear naming in components.
     mutateAsync: mutation.mutateAsync,
     isLoading: mutation.isLoading,
     error: mutation.error,
-    isError: mutation.isError,
-    isSuccess: mutation.isSuccess,
   };
 };
