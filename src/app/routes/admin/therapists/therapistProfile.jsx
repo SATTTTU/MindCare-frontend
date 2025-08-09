@@ -1,23 +1,21 @@
 import { useParams, useNavigate } from "react-router-dom";
-import CookProfileDetails from "@/modules/admin/cookProfile/components/cookProfile";
-import { Sidebar } from "@/components/ui/admin/aside/aside";
+import { Sidebar } from "@/components/ui/aside";
+import TherapistProfileDetails from "@/modules/admin/therapists-profile/components/therapistProfile";
 
-export const CookProfileRoute = () => {
+export const TherapistProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const handleStatusChange = (therapistId, newStatus) => {
-    // This logic can be expanded to refresh data or show user notifications
-    console.log(`Status changed for cook ${therapistId} to ${newStatus}`);
+    console.log(`Status changed for therapist ${therapistId} to ${newStatus}`);
   };
 
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
       <div className="flex-1 p-8 overflow-auto">
-        <div className="mb-4"></div>
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <CookProfileDetails
+          <TherapistProfileDetails
             cookId={id}
             navigate={navigate}
             onStatusChange={handleStatusChange}

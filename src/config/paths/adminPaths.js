@@ -33,5 +33,12 @@ export const adminPaths = {
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
+   therapistProfile: {
+    path: "admin/therapists/:id",
+    getHref: (redirectTo) =>
+      `therapists${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
+  },
 };
 

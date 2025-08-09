@@ -61,7 +61,7 @@ const TherapistRow = ({ therapist, navigate }) => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-center">
         <span
-          onClick={() => navigate(`/admin/therapistDetails/${id}`)}
+          onClick={() => navigate(`/admin/therapists/${id}`)}
           className="text-blue-500 hover:text-blue-700 hover:underline cursor-pointer font-medium"
         >
           View Profile

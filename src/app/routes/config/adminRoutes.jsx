@@ -49,6 +49,15 @@ export const adminRoutes = [
               };
             },
           },
+           {
+            path: paths.admin.therapistProfile.path,
+            lazy: async () => {
+              const { TherapistProfile } = await import("../../routes/admin/therapists/therapistProfile");
+              return {
+                Component: TherapistProfile,
+              };
+            },
+          },
         ],
       },
     ],
