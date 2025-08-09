@@ -17,7 +17,7 @@ export const LoginForm = () => {
       // The redirect logic here mirrors the logic in the context's login function
       const { role, doctorInfo } = user;
       if (role.toLowerCase() === 'admin') {
-        navigate('/admin/dashboard');
+        navigate('/admin-dashboard');
       } else if (doctorInfo) {
         switch (doctorInfo.applicationStatus.toLowerCase()) {
           case 'approved': navigate('/doctor-dashboard'); break;

@@ -99,7 +99,7 @@ export const TherapistRoute = () => {
       <Sidebar />
       <div className="p-6 w-full">
         <Link
-          to="/admin/dashboard"
+          to="/admin-dashboard"
           className="mr-2 p-1 rounded-full hover:bg-gray-100 text-gray-500 cursor-pointer"
         >
           <FaArrowLeft size={20} />

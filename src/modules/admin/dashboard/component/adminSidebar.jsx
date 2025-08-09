@@ -45,7 +45,7 @@ export const AdminSidebar = () => {
           Appointments
         </Link>
         <Link
-          to="/blogs"
+          to="/admin/blogs"
           className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg"
         >
           <FaBlog className="mr-3" />

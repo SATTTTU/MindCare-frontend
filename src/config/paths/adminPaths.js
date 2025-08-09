@@ -20,7 +20,7 @@ export const adminPaths = {
       }`,
   },
     blogs: {
-    path: "blogs",
+    path: "/admin/blogs",
     getHref: (redirectTo) =>
       `blogs${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
