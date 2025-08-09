@@ -1,24 +1,18 @@
+// api/getDocuments.js
 import { api } from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 
-// Get Users API
-const getDocuments = async () => {
-  const response = await api.get("/api/Admin/users");
+// API call
+const getDocuments = async (doctorId) => {
+  const response = await api.get(`/api/Admin/doctors/${doctorId}/documents`);
   return response;
 };
 
-export const usegetDocuments = (queryConfig = {}) => {
-  const query = useQuery({
-    queryKey: ["documents"],
-    queryFn: getDocuments,
+// Custom hook
+export const usegetDocuments = (doctorId, queryConfig = {}) => {
+  return useQuery({
+    queryKey: ["documents", doctorId],
+    queryFn: () => getDocuments(doctorId),
     ...queryConfig,
   });
-
-  return {
-    data: query.data,
-    isLoading: query.isLoading,
-    error: query.error,
-    isError: query.isError,
-    isSuccess: query.isSuccess,
-  };
 };

@@ -1,9 +1,9 @@
+// verify-cook.js
 import { api } from "@/lib/api-client";
 import { useMutation } from "@tanstack/react-query";
 
 export const verifyTherapist = (therapistId, params) => {
-  console.log(`Making verify request to /api/admins/verify-cook/${therapistId} with params:`, params);
-  return api.put(`/api/admins/verify-cook/${therapistId}`, params);
+  return api.patch(`/api/Admin/doctors/${therapistId}/approve`, params);
 };
 
 export const useVerifyTherapist = (therapistId, { mutationConfig } = {}) => {
