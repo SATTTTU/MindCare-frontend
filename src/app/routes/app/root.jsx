@@ -6,11 +6,28 @@ export const AppRootErrorBoundary = ({ children }) => {
     return children;
   } catch (error) {
     console.error("Error Boundary Caught:", error);
-    return <div>Something went wrong. Please try again later.</div>;
+    return (
+      <div
+        style={{
+          padding: "2rem",
+          margin: "2rem auto",
+          maxWidth: "500px",
+          background: "#fff0f0",
+          border: "1px solid #ffcccc",
+          borderRadius: "12px",
+          color: "#b91c1c",
+          textAlign: "center",
+          fontWeight: "bold",
+          fontSize: "1.2rem",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
+        }}
+      >
+        Something went wrong. Please try again later.
+      </div>
+    );
   }
 };
 
-// Root Components for Auth, Admin, Cook, and User
 export const AuthRoot = () => {
   return (
     <AppRootErrorBoundary>
