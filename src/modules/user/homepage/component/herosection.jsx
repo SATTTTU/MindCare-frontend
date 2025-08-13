@@ -4,7 +4,6 @@ import { Box, Typography, Button, Container, Stack } from "@mui/material";
 import { ArrowBackIos, ArrowForwardIos, Favorite, Psychology } from "@mui/icons-material";
 import { Message, MenuBook, Diversity3, Spa } from "@mui/icons-material";
 
-// Custom Arrow Components
 const NextArrow = ({ onClick }) => (
   <Box
     onClick={onClick}
@@ -87,7 +86,6 @@ const HeroSection = () => {
           alignItems="center"
           justifyContent="space-between"
         >
-          {/* Left - Text */}
           <Box>
             <Typography variant="h2" fontWeight="bold" gutterBottom>
               Your Mental{" "}
