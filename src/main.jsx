@@ -9,14 +9,11 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./index.css"; // Your global styles, including Tailwind CSS
 
-// Create the router instance
 const router = createAppRouter();
 
-// Get the root element
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement);
 
-// Render the app. The RouterProvider is the single entry point for your routed app.
 root.render(
   <React.StrictMode>
     <AppProvider>
