@@ -25,11 +25,17 @@ export const therapistRoutes = [
             },
           },
           {
-            // Add a route for the success page
             path: paths.therapists.applicationReview.path,
             lazy: async () => {
-              const { ApplicationReviewPage } = await import("../../../modules/therapist/components/reviewPage"); // Example component
+              const { ApplicationReviewPage } = await import("../../../modules/therapists/therapist/components/reviewPage"); // Example component
               return { Component: ApplicationReviewPage };
+            }
+          },
+          {
+            path: paths.therapists.therapistDashboard.path,
+            lazy: async () => {
+              const { TherapistDashboard } = await import("../../../modules/therapists/dashboard/components/daashboard"); // Example component
+              return { Component: TherapistDashboard };
             }
           }
         ],

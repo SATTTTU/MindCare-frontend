@@ -1,3 +1,4 @@
+
 // src/config/paths.js -> therapistPaths
 export const therapistPaths = {
   root: {
@@ -14,5 +15,11 @@ export const therapistPaths = {
     path: "application-review",
     getHref: () => "/therapist/application-review",
   },
-  // REMOVED: be_therapist path is no longer needed
+  therapistDashboard:{
+    path: "/doctor-dashboard",
+    getHref: (redirectTo) =>
+      `/doctor-dashboard${
+        redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
+      }`,
+  }
 };

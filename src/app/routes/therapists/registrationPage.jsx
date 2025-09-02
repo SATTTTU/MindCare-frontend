@@ -1,6 +1,6 @@
 // src/routes/therapists/registrationPage.js
-import { MultiStepForm } from '@/modules/therapist/components/MultiStepForm';
-import { DoctorForm } from '@/modules/therapist/components/onboarding';
+import { MultiStepForm } from '@/modules/therapists/therapist/components/MultiStepForm';
+import { DoctorForm } from '@/modules/therapists/therapist/components/onboarding';
 import React, { useState } from 'react';
 
 export const DoctorRegistrationPage = () => {
