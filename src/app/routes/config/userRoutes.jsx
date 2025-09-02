@@ -49,10 +49,19 @@ export const userRoutes = [
       {
         path: paths.user.therapists.path, // e.g., '/journal'
         lazy: async () => {
-          const { DoctorBookingSystem } = await import(
-            "../../../modules/user/therapists/component/DoctorBooking"
+          const { DoctorsPage } = await import(
+            "../../../modules/user/therapists/component/alldoctors"
           );
-          return { Component: DoctorBookingSystem };
+          return { Component: DoctorsPage };
+        },
+      },
+      {
+        path: paths.user.therapistProfile.path, // e.g., '/journal'
+        lazy: async () => {
+          const { DoctorProfile } = await import(
+            "../../../modules/user/therapists/component/doctorProfile"
+          );
+          return { Component: DoctorProfile };
         },
       },
 

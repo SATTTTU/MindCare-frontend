@@ -1,15 +1,16 @@
+// hooks/useGetDoctors.js
 import { api } from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 
-const getTherapists = async () => {
-  const response = await api.get('/api/User/therapists');
-  return response;
+const getDoctors = async () => {
+  const response = await api.get("/api/Doctors");
+  return response; 
 };
 
-export const useGetBlogs = (options = {}) => {
+export const useGetDoctors = (options = {}) => {
   return useQuery({
-    queryKey: ['therapists'],
-    queryFn: getTherapists,
-    ...options
+    queryKey: ["doctors"],
+    queryFn: getDoctors,
+    ...options,
   });
 };

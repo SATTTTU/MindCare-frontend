@@ -1,4 +1,3 @@
-// src/main.jsx (Corrected)
 
 import React from "react";
 import { createRoot } from "react-dom/client";
@@ -7,7 +6,7 @@ import { AppProvider } from "./app/provider";
 import { createAppRouter } from "./app/router";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import "./index.css"; // Your global styles, including Tailwind CSS
+import "./index.css"; 
 
 const router = createAppRouter();
 
