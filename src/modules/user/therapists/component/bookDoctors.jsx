@@ -5,6 +5,7 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import { z } from "zod";
 import { Calendar, Clock, MessageSquare, CheckCircle, User, Stethoscope } from "lucide-react";
 import { useBookAppointment } from "../api/book-appoinment";
+import {toast} from "react-toastify"
 
 // Zod validation schema
 const AppointmentSchema = z.object({
@@ -92,7 +93,7 @@ export const AppointmentForm = ({ doctor, user, availableSlots = [], onSuccess, 
                 resetForm();
               },
               onError: (err) => {
-                console.error("Booking error:", err);
+                toast.error("Booking error:", err);
                 alert(err?.response?.data?.message || "Failed to book appointment. Please try again.");
               },
             });

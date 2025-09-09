@@ -14,37 +14,14 @@ import {
 import { TherapistSidebar } from "@/components/ui/therapistSideBar/sideBar";
 import { useAuth } from "@/context/AuthContext";
 import { AvailabilityComponent } from "./availability";
+import { AppointmentsSection } from "./appointments";
 
 export const TherapistDashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
 
-  const appointmentRequests = [
-    {
-      id: 1,
-      patientName: "Sarah Johnson",
-      date: "2025-09-03",
-      time: "10:00 AM",
-      type: "Initial Consultation",
-      status: "pending",
-      phone: "(555) 123-4567",
-      email: "sarah.j@email.com",
-      notes: "Seeking help with anxiety and stress management",
-    },
-    {
-      id: 2,
-      patientName: "Michael Chen",
-      date: "2025-09-03",
-      time: "2:00 PM",
-      type: "Follow-up Session",
-      status: "pending",
-      phone: "(555) 234-5678",
-      email: "m.chen@email.com",
-      notes: "Progress check for CBT treatment",
-    },
-  ];
+ 
 
-  const [requests, setRequests] = useState(appointmentRequests);
 
   const handleRequestAction = (id, action) => {
     setRequests((prev) =>
@@ -131,43 +108,8 @@ export const TherapistDashboard = () => {
         {activeTab === "availability" && <AvailabilityComponent />}
 
         {activeTab === "appointments" && (
-          <div className="bg-white rounded-lg shadow-sm divide-y divide-gray-200">
-            {requests.map((req) => (
-              <div key={req.id} className="p-6 flex justify-between">
-                <div>
-                  <h4 className="font-semibold">{req.patientName}</h4>
-                  <p className="text-sm text-gray-600">
-                    {req.date} at {req.time} • {req.type}
-                  </p>
-                  <p className="text-xs text-gray-500">{req.email}</p>
-                  <span
-                    className={`mt-2 inline-block px-2 py-1 rounded text-xs ${getStatusColor(
-                      req.status
-                    )}`}
-                  >
-                    {req.status}
-                  </span>
-                </div>
-                {req.status === "pending" && (
-                  <div className="space-x-2">
-                    <button
-                      onClick={() => handleRequestAction(req.id, "approve")}
-                      className="px-3 py-1 bg-green-600 text-white rounded"
-                    >
-                      <Check className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleRequestAction(req.id, "reject")}
-                      className="px-3 py-1 bg-red-600 text-white rounded"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+  <AppointmentsSection doctorId={user?.id} />
+)}
       </div>
     </div>
   );
