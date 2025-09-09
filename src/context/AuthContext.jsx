@@ -70,13 +70,12 @@ export const AuthProvider = ({ children }) => {
     if (doctorInfo) {
       switch (doctorInfo.applicationStatus.toLowerCase()) {
         case 'approved': navigate('/doctor-dashboard'); break;
-        case 'rejected': navigate('/application-rejected'); break;
+        case 'rejected': navigate('/application-review'); break;
         case 'pending': navigate('/application-review'); break;
-        default: navigate('/register-as-therapist'); break;
+        default: navigate('/'); break;
       }
     } else {
-      // User who has not yet applied to be a doctor
-      navigate('/register-as-therapist');
+      navigate('/');
     }
   };
 

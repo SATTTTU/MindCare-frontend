@@ -2,11 +2,11 @@ import React, { useState, useRef, useCallback } from "react";
 import { IoIosNotifications, IoMdSearch } from "react-icons/io";
 import { FaCalendarCheck, FaHeartbeat, FaSmile, FaBookOpen } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { ProfileCard } from "./profilecard";
 import { Sidebar } from "@/components/ui/aside";
+import { ProfileCard } from "./profilecard";
+import { useAuth } from "@/context/AuthContext";
 
-// Custom hook to detect clicks outside a specified element
+// Hook for detecting outside clicks
 const useOutsideClick = (ref, callback) => {
   const handleClick = useCallback(
     (event) => {
@@ -16,7 +16,6 @@ const useOutsideClick = (ref, callback) => {
     },
     [ref, callback]
   );
-  
 
   React.useEffect(() => {
     document.addEventListener("mousedown", handleClick);
@@ -26,7 +25,7 @@ const useOutsideClick = (ref, callback) => {
   }, [handleClick]);
 };
 
-// A modern, themed stats card with skeleton loading
+// Stats Card
 const StatsCard = ({ icon, title, value, trend, delay, isLoading }) => {
   if (isLoading) {
     return (
@@ -57,46 +56,50 @@ const StatsCard = ({ icon, title, value, trend, delay, isLoading }) => {
   );
 };
 
-// A list for recent user activities like journal entries
+// Recent Activity List
 const RecentActivityList = ({ activities, isLoading }) => {
-    if (isLoading) {
-        return (
-            <div className="bg-white p-6 rounded-xl shadow-sm animate-pulse">
-                <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
-                <div className="space-y-4">
-                    {[...Array(3)].map((_, i) => (
-                        <div key={i} className="flex items-center p-2">
-                            <div className="w-10 h-10 rounded-lg bg-gray-200 mr-4"></div>
-                            <div className="flex-1">
-                                <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
-                                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    }
+  if (isLoading) {
     return (
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Recent Activity</h3>
-            <div className="space-y-3">
-                {activities.map((activity) => (
-                    <div key={activity.id} className="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                        <div className="p-3 bg-gray-100 rounded-lg mr-4">{activity.icon}</div>
-                        <div className="flex-1">
-                            <p className="font-semibold text-gray-700">{activity.title}</p>
-                            <p className="text-sm text-gray-500">{activity.description}</p>
-                        </div>
-                        <span className="text-sm text-gray-400">{activity.time}</span>
-                    </div>
-                ))}
+      <div className="bg-white p-6 rounded-xl shadow-sm animate-pulse">
+        <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="flex items-center p-2">
+              <div className="w-10 h-10 rounded-lg bg-gray-200 mr-4"></div>
+              <div className="flex-1">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
             </div>
+          ))}
         </div>
+      </div>
     );
+  }
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-sm">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Recent Activity</h3>
+      <div className="space-y-3">
+        {activities.map((activity) => (
+          <div
+            key={activity.id}
+            className="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors"
+          >
+            <div className="p-3 bg-gray-100 rounded-lg mr-4">{activity.icon}</div>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-700">{activity.title}</p>
+              <p className="text-sm text-gray-500">{activity.description}</p>
+            </div>
+            <span className="text-sm text-gray-400">{activity.time}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export const UserDashboard = React.memo(() => {
+  const { user } = useAuth(); // 🔹 real user
   const [showProfile, setShowProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const profileRef = useRef(null);
@@ -136,9 +139,27 @@ export const UserDashboard = React.memo(() => {
   ];
 
   const recentActivities = [
-    { id: 1, icon: <FaBookOpen className="text-green-500"/>, title: "Journal Entry Added", description: "Reflection on today's progress.", time: "2h ago" },
-    { id: 2, icon: <FaCalendarCheck className="text-blue-500"/>, title: "Session Confirmed", description: "With Dr. Anya Sharma.", time: "1d ago" },
-    { id: 3, icon: <FaSmile className="text-yellow-500"/>, title: "Mood Logged", description: "Feeling calm and focused.", time: "2d ago" },
+    {
+      id: 1,
+      icon: <FaBookOpen className="text-green-500" />,
+      title: "Journal Entry Added",
+      description: "Reflection on today's progress.",
+      time: "2h ago",
+    },
+    {
+      id: 2,
+      icon: <FaCalendarCheck className="text-blue-500" />,
+      title: "Session Confirmed",
+      description: "With Dr. Anya Sharma.",
+      time: "1d ago",
+    },
+    {
+      id: 3,
+      icon: <FaSmile className="text-yellow-500" />,
+      title: "Mood Logged",
+      description: "Feeling calm and focused.",
+      time: "2d ago",
+    },
   ];
 
   const notifications = [
@@ -148,7 +169,10 @@ export const UserDashboard = React.memo(() => {
   ];
 
   const toggleProfile = useCallback(() => setShowProfile((p) => !p), []);
-  const toggleNotifications = useCallback(() => setShowNotifications((p) => !p), []);
+  const toggleNotifications = useCallback(
+    () => setShowNotifications((p) => !p),
+    []
+  );
 
   useOutsideClick(profileRef, () => setShowProfile(false));
   useOutsideClick(notificationRef, () => setShowNotifications(false));
@@ -157,15 +181,25 @@ export const UserDashboard = React.memo(() => {
     <div className="flex h-screen bg-slate-50 font-sans">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
         <header className="bg-white/80 backdrop-blur-sm p-4 flex items-center justify-between border-b border-gray-200">
           <h1 className="text-2xl font-bold text-gray-800">
-            Mental Health<br/>Dashboard
+            Mental Health
+            <br />
+            Dashboard
           </h1>
           <div className="flex items-center gap-6">
+            {/* Search */}
             <div className="relative">
               <IoMdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" placeholder="Search..." className="pl-10 pr-4 py-2 w-64 rounded-lg bg-gray-100 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition"/>
+              <input
+                type="text"
+                placeholder="Search..."
+                className="pl-10 pr-4 py-2 w-64 rounded-lg bg-gray-100 focus:bg-white focus:ring-2 focus:ring-indigo-500 transition"
+              />
             </div>
+
+            {/* Notifications */}
             <div className="relative">
               <button onClick={toggleNotifications} className="relative">
                 <IoIosNotifications className="text-2xl text-gray-600 hover:text-indigo-500 transition" />
@@ -177,11 +211,19 @@ export const UserDashboard = React.memo(() => {
                 {showNotifications && (
                   <motion.div
                     ref={notificationRef}
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-3 w-72 bg-white shadow-xl rounded-lg p-4 z-50 border border-gray-100">
-                    <h2 className="text-lg font-semibold mb-2 text-gray-800">Notifications</h2>
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute right-0 mt-3 w-72 bg-white shadow-xl rounded-lg p-4 z-50 border border-gray-100"
+                  >
+                    <h2 className="text-lg font-semibold mb-2 text-gray-800">
+                      Notifications
+                    </h2>
                     {notifications.map((n) => (
-                      <div key={n.id} className="p-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md">
+                      <div
+                        key={n.id}
+                        className="p-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
+                      >
                         {n.message}
                       </div>
                     ))}
@@ -189,16 +231,25 @@ export const UserDashboard = React.memo(() => {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Profile */}
             <div className="relative">
-                <div onClick={toggleProfile} className="cursor-pointer">
-                    <img src="https://i.pravatar.cc/40?u=johnD" alt="Profile" className="w-10 h-10 rounded-full"/>
-                </div>
+              <div onClick={toggleProfile} className="cursor-pointer">
+                <img
+                  src={user?.avatar || `https://i.pravatar.cc/40?u=${user?.email}`}
+                  alt={user?.name || "Profile"}
+                  className="w-10 h-10 rounded-full"
+                />
+              </div>
               <AnimatePresence>
                 {showProfile && (
                   <motion.div
                     ref={profileRef}
-                    initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                    className="absolute right-0 mt-2 bg-white rounded-lg z-50 shadow-xl border border-gray-100">
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="absolute right-0 mt-2 bg-white rounded-lg z-50 shadow-xl border border-gray-100"
+                  >
                     <ProfileCard />
                   </motion.div>
                 )}
@@ -207,17 +258,34 @@ export const UserDashboard = React.memo(() => {
           </div>
         </header>
 
+        {/* Main */}
         <main className="flex-1 overflow-y-auto p-6">
           <div className="bg-indigo-100/50 border border-indigo-200/50 rounded-xl p-8 mb-6">
-            <h2 className="text-3xl font-bold text-indigo-900">Welcome back, John!</h2>
-            <p className="text-indigo-700 mt-1">Here's your mental health journey overview.</p>
+            <h2 className="text-3xl font-bold text-indigo-900">
+              Welcome back, {user?.name || "User"}!
+            </h2>
+            <p className="text-indigo-700 mt-1">
+              Here's your mental health journey overview.
+            </p>
           </div>
+
+          {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             {dashboardStats.map((stat, index) => (
-              <StatsCard key={index} {...stat} delay={index} isLoading={isLoading} />
+              <StatsCard
+                key={index}
+                {...stat}
+                delay={index}
+                isLoading={isLoading}
+              />
             ))}
           </div>
-          <RecentActivityList activities={recentActivities} isLoading={isLoading} />
+
+          {/* Recent Activity */}
+          <RecentActivityList
+            activities={recentActivities}
+            isLoading={isLoading}
+          />
         </main>
       </div>
     </div>

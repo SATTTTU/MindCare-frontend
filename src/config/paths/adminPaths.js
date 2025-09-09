@@ -20,23 +20,23 @@ export const adminPaths = {
       }`,
   },
     blogs: {
-    path: "/admin/blogs",
+    path: "get-blogs",
     getHref: (redirectTo) =>
-      `blogs${
+      `get-blogs${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
    therapists: {
-    path: "admin/therapists",
+    path: "get-therapists",
     getHref: (redirectTo) =>
       `therapists${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },
    therapistProfile: {
-    path: "admin/therapists/:id",
+    path: "get-therapists/:id",
     getHref: (redirectTo) =>
-      `therapists${
+      `get-therapists${
         redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ""
       }`,
   },

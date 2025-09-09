@@ -5,37 +5,35 @@ import { FaCookie } from "react-icons/fa";
 import { TbReportSearch } from "react-icons/tb";
 import { FiLogOut, FiMenu } from "react-icons/fi";
 import { Link, useLocation } from "react-router-dom";
-// import logo from "@/assets/unnamed.png";
-// import ConfirmModal from "../confirmmodel/confirmmodel";
-// import { useAdminLogout } from "@/modules/admin/dashboard/api/logout";
 import { toast } from "react-toastify";
+import { useAuth } from "@/context/AuthContext"; // ✅ import AuthContext hook
+
 export const Sidebar = () => {
   const location = useLocation();
   const [showSidebar, setShowSidebar] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  const { logout } = useAuth(); // ✅ use the logout function from AuthContext
+
   const menuItems = [
     { to: "/user-dashboard", icon: <MdDashboard />, text: "Dashboard" },
-    {to:"/journel", icon: <CiUser />, text: "Journel" },
-    { to: "/therapists", icon: <CiUser />, text: "Therapists " },
-    { to: "/mood-tracking", icon: <FaCookie />, text: "Mood Tracking " },
-    {to:"/blogs",icon:<CiViewBoard/>, text: "Blogs" },
-    { to: "/activities", icon: <MdPayments />, text: "Wellness Activities " },
+    { to: "/journel", icon: <CiUser />, text: "Journel" },
+    { to: "/therapists", icon: <CiUser />, text: "Therapists" },
+    { to: "/mood-tracking", icon: <FaCookie />, text: "Mood Tracking" },
+    { to: "/blogs", icon: <CiViewBoard />, text: "Blogs" },
+    { to: "/activities", icon: <MdPayments />, text: "Wellness Activities" },
     { to: "/help", icon: <TbReportSearch />, text: "Help & Supports" },
   ];
-//   const { mutateAsync: logout, isLoading } = useAdminLogout();
-  const handleLogout = async () => {  
-    // try {
-        toast.success("Logout")
-//       await logout();
-//       localStorage.removeItem("adminToken"); 
-//       toast.success("logout sucessfull")
-//       window.location.href = "/admin/login"; // Redirect
-//     } catch (error) {
-//       console.log("logout fsiled",error)
-//       toast.error("Logout failed", error);
-    };
-//   };
+
+  const handleLogout = async () => {
+    try {
+      await logout(); // ✅ useAuth handles token removal + redirect
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed");
+    }
+  };
 
   const handleToggleSidebar = () => {
     setShowSidebar(!showSidebar);
@@ -59,10 +57,7 @@ export const Sidebar = () => {
       >
         {/* Header */}
         <Link to="/user-dashboard" className="flex items-center p-6">
-          {/* <div className="h-5 w-10 flex items-center justify-center">
-            <img src={logo} alt="Logo" />
-          </div> */}
-          <span className="text-3xl font-bold text-green-600">MindCare </span>
+          <span className="text-3xl font-bold text-green-600">MindCare</span>
         </Link>
 
         {/* Navigation */}
@@ -79,11 +74,11 @@ export const Sidebar = () => {
           ))}
         </nav>
 
+        {/* Logout Button */}
         <div className="px-4 py-4 border-t border-gray-200">
           <button
-        //   disabled={isLoading}
             onClick={() => setShowLogoutModal(true)}
-            className="flex  cursor-pointer items-center gap-3 w-full px-4 py-2.5 text-gray-600 hover:bg-red-50 hover:text-red-600 transition rounded-lg group"
+            className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-600 hover:bg-red-50 hover:text-red-600 transition rounded-lg group"
           >
             <FiLogOut className="text-lg group-hover:animate-pulse" />
             <span className="text-sm font-medium">Logout</span>
@@ -92,17 +87,33 @@ export const Sidebar = () => {
       </div>
 
       {/* Confirm Logout Modal */}
-      {/* {showLogoutModal && (
-        <ConfirmModal
-          title="Logout Confirmation"
-          message="Are you sure you want to log out?"
-          confirmLabel="Logout"
-          cancelLabel="Cancel"
-          onCancel={() => setShowLogoutModal(false)}
-          onConfirm={handleLogout}
-          confirmColor="bg-red-600 hover:bg-red-700"
-        />
-      )} */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white rounded-lg shadow-lg w-80 p-6">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Logout Confirmation
+            </h2>
+            <p className="text-gray-600 mt-2">
+              Are you sure you want to log out?
+            </p>
+
+            <div className="flex justify-end mt-6 gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 rounded-md border hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

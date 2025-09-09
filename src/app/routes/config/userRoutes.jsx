@@ -7,7 +7,7 @@ export const userRoutes = [
   {
     // The ProtectedRoute now wraps all routes that require a user to be logged in.
     // We allow both 'User' and 'Admin' to access these common user routes.
-    element: <ProtectedRoute allowedRoles={['User', 'Admin',]} />,
+    element: <ProtectedRoute allowedRoles={['User']} />,
     children: [
       {
         path: paths.user.dashboard.path, 

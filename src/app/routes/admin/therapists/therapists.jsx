@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { FaArrowLeft } from "react-icons/fa";
 import { useGetAllTherapists } from "@/modules/admin/therapists/api/get-alltherapists";
-import { Sidebar } from "@/components/ui/aside";
 import TherapistFilter from "@/modules/admin/therapists/components/therapistsFilter";
 import TherapistTable from "@/modules/admin/therapists/components/therapistTable";
 import Pagination from "@/components/ui/pagination/pagination";
+import { AdminSidebar } from "@/modules/admin/dashboard/component/adminSidebar";
 
 
 export const TherapistRoute = () => {
@@ -96,7 +96,7 @@ export const TherapistRoute = () => {
 
   return (
     <section className="flex h-screen font-sans bg-gray-100">
-      <Sidebar />
+      <AdminSidebar />
       <div className="p-6 w-full">
         <Link
           to="/admin-dashboard"

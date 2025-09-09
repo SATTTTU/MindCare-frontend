@@ -4,34 +4,16 @@ import {
   Calendar,
   Clock,
   User,
-  Phone,
-  Mail,
   Settings,
-  Bell,
-  Check,
-  X,
 } from "lucide-react";
-import { TherapistSidebar } from "@/components/ui/therapistSideBar/sideBar";
 import { useAuth } from "@/context/AuthContext";
 import { AvailabilityComponent } from "./availability";
 import { AppointmentsSection } from "./appointments";
 
 export const TherapistDashboard = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth(); // ✅ make sure logout is exposed from AuthContext
   const [activeTab, setActiveTab] = useState("overview");
-
- 
-
-
-  const handleRequestAction = (id, action) => {
-    setRequests((prev) =>
-      prev.map((req) =>
-        req.id === id
-          ? { ...req, status: action === "approve" ? "confirmed" : "rejected" }
-          : req
-      )
-    );
-  };
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -48,7 +30,6 @@ export const TherapistDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <TherapistSidebar />
 
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
@@ -63,10 +44,11 @@ export const TherapistDashboard = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="p-2 text-gray-400 hover:text-gray-600">
-              <Bell className="h-5 w-5" />
-            </button>
-            <button className="p-2 text-gray-400 hover:text-gray-600">
+            {/* Settings Button */}
+            <button
+              className="p-2 text-gray-400 hover:text-gray-600"
+              onClick={() => setIsSettingsOpen(true)}
+            >
               <Settings className="h-5 w-5" />
             </button>
           </div>
@@ -97,6 +79,7 @@ export const TherapistDashboard = () => {
         </nav>
       </div>
 
+      {/* Main Content */}
       <div className="px-6 py-6 space-y-6">
         {activeTab === "overview" && (
           <div className="bg-white rounded-lg shadow-sm p-6">
@@ -108,9 +91,32 @@ export const TherapistDashboard = () => {
         {activeTab === "availability" && <AvailabilityComponent />}
 
         {activeTab === "appointments" && (
-  <AppointmentsSection doctorId={user?.id} />
-)}
+          <AppointmentsSection doctorId={user?.id} />
+        )}
       </div>
+
+      {/* Settings Modal */}
+      {isSettingsOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-80 p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Settings</h2>
+            
+            <button
+              onClick={logout}
+              className="w-full py-2 px-4 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+            >
+              Logout
+            </button>
+
+            <button
+              onClick={() => setIsSettingsOpen(false)}
+              className="mt-3 w-full py-2 px-4 border rounded-md hover:bg-gray-100 transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
