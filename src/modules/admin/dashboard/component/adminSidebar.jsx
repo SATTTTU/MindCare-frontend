@@ -31,21 +31,14 @@ export const AdminSidebar = () => {
           User Management
         </Link>
         <Link
-          to="/admin/therapists"
+          to="/get-therapists"
           className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg"
         >
           <FaUserMd className="mr-3" />
           Therapist Management
         </Link>
         <Link
-          to="/appointments"
-          className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg"
-        >
-          <FaCalendarAlt className="mr-3" />
-          Appointments
-        </Link>
-        <Link
-          to="/admin/blogs"
+          to="/get-blogs"
           className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg"
         >
           <FaBlog className="mr-3" />

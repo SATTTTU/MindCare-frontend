@@ -8,7 +8,7 @@ import ProtectedRoute from "./protectedRoutes";
 export const therapistRoutes = [
   {
     path: paths.therapists.root.path,
-    element: <ProtectedRoute allowedRoles={['User', 'Admin']}> {/* User role should be able to apply */}
+    element: <ProtectedRoute allowedRoles={['Doctor', 'Admin']}> {/* User role should be able to apply */}
       <Outlet />
     </ProtectedRoute>,
     ErrorBoundary: AppRootErrorBoundary,
@@ -16,21 +16,7 @@ export const therapistRoutes = [
       {
         element: <AuthRoot />,
         children: [
-           {
-            // The single route that handles the entire multi-step registration
-            path: paths.therapists.onboarding.path,
-            lazy: async () => {
-              const { DoctorRegistrationPage } = await import("../../routes/therapists/registrationPage");
-              return { Component: DoctorRegistrationPage };
-            },
-          },
-          {
-            path: paths.therapists.applicationReview.path,
-            lazy: async () => {
-              const { ApplicationReviewPage } = await import("../../../modules/therapists/therapist/components/reviewPage"); // Example component
-              return { Component: ApplicationReviewPage };
-            }
-          },
+          
           {
             path: paths.therapists.therapistDashboard.path,
             lazy: async () => {

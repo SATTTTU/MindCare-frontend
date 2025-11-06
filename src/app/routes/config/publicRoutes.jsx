@@ -48,5 +48,20 @@ export const publicRoutes = [
       );
       return { Component: TermsOfService };
     },
+    
   },
+   {
+              path: paths.therapists.onboarding.path,
+              lazy: async () => {
+                const { DoctorRegistrationPage } = await import("../../routes/therapists/registrationPage");
+                return { Component: DoctorRegistrationPage };
+              },
+            },
+            {
+              path: paths.therapists.applicationReview.path,
+              lazy: async () => {
+                const { ApplicationReviewPage } = await import("../../../modules/therapists/therapist/components/reviewPage"); // Example component
+                return { Component: ApplicationReviewPage };
+              }
+            },
 ];

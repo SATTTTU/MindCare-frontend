@@ -1,39 +1,40 @@
-"use client";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-import { Star, Users, Calendar, MapPin, GraduationCap } from "lucide-react";
+import { Star, Users, Calendar, MapPin } from "lucide-react";
 import { useGetSingleDoctor } from "../api/usegetSingleDoctor";
 import { usegetDoctorAvailaibity } from "../api/getDoctorAvailability";
+import { AppointmentForm } from "./bookDoctors";
+import { useAuth } from "@/context/AuthContext"; // ✅ import your hook
 
 export const DoctorProfile = () => {
   const { id } = useParams();
   const [selectedSlot, setSelectedSlot] = useState(null);
 
-  const { data: doctorData, isLoading: loadingDoctor, isError: errorDoctor } = useGetSingleDoctor(id);
+  const { user } = useAuth(); // ✅ get logged-in user
 
-const { data: availabilityData, isLoading: loadingAvailability } = usegetDoctorAvailaibity(id);
+  const { data: doctorData, isLoading: loadingDoctor, isError: errorDoctor } =
+    useGetSingleDoctor(id);
 
-const availability = Array.isArray(availabilityData) 
-  ? availabilityData 
-  : Array.isArray(availabilityData?.data) 
-    ? availabilityData.data 
+  const { data: availabilityData, isLoading: loadingAvailability } =
+    usegetDoctorAvailaibity(id);
+
+  const availability = Array.isArray(availabilityData)
+    ? availabilityData
+    : Array.isArray(availabilityData?.data)
+    ? availabilityData.data
     : [];
 
-  if (loadingDoctor || loadingAvailability) return <p className="text-center mt-10">Loading doctor profile...</p>;
-  if (errorDoctor || !doctorData) return <p className="text-center mt-10 text-red-600">Doctor not found</p>;
+  if (loadingDoctor || loadingAvailability)
+    return <p className="text-center mt-10">Loading doctor profile...</p>;
+  if (errorDoctor || !doctorData)
+    return <p className="text-center mt-10 text-red-600">Doctor not found</p>;
 
-  // Axios response might wrap data in `response.data`
-  const doctor = doctorData || doctorData;
-
+  const doctor = doctorData;
   const imageUrl = doctor.profileImageUrl?.startsWith("http")
     ? doctor.profileImageUrl
-    : `${import.meta.env.VITE_APP_API_URL || "http://localhost:5000"}${doctor.profileImageUrl}`;
-
-  const handleBooking = () => {
-    if (!selectedSlot) return alert("Please select a slot");
-    alert(`Booked slot: ${new Date(selectedSlot.startTime).toLocaleString()} - ${new Date(selectedSlot.endTime).toLocaleTimeString()}`);
-    // TODO: Call API to book the slot
-  };
+    : `${import.meta.env.VITE_APP_API_URL || "http://localhost:5000"}${
+        doctor.profileImageUrl
+      }`;
 
   return (
     <div className="max-w-3xl mx-auto p-6 shadow-md rounded-xl bg-white mt-10">
@@ -53,7 +54,9 @@ const availability = Array.isArray(availabilityData)
         </div>
         <h2 className="text-2xl font-bold text-gray-800">{doctor.name}</h2>
         <p className="text-blue-600 font-medium">{doctor.specialization}</p>
-        <p className="text-gray-600 mt-2">{doctor.description || "No description available."}</p>
+        <p className="text-gray-600 mt-2">
+          {doctor.description || "No description available."}
+        </p>
       </div>
 
       {/* Doctor Stats */}
@@ -85,23 +88,26 @@ const availability = Array.isArray(availabilityData)
                 slot.isBooked
                   ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                   : selectedSlot?.id === slot.id
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-800 hover:bg-blue-50"
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50"
               }`}
             >
-              {new Date(slot.startTime).toLocaleString()} - {new Date(slot.endTime).toLocaleTimeString()}
+              {new Date(slot.startTime).toLocaleString()}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Book Appointment Button */}
-      <button
-        onClick={handleBooking}
-        className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-      >
-        Book Appointment
-      </button>
+      {/* Appointment Form */}
+      {selectedSlot && (
+        <AppointmentForm
+          doctor={doctor}
+          user={user} // ✅ use real auth user here
+          availableSlots={availability}
+          onSuccess={() => setSelectedSlot(null)}
+          onCancel={() => setSelectedSlot(null)}
+        />
+      )}
     </div>
   );
 };
