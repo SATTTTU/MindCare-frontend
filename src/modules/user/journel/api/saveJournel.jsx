@@ -6,7 +6,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
  * @returns {string|null} The user ID string or null if not found.
  */
 const getUserId = () => {
-  return localStorage.getItem('userId');
+  try {
+    const userDataString = localStorage.getItem('userData');
+    if (!userDataString) return null;
+
+    const userData = JSON.parse(userDataString);
+    return userData.id || null;
+  } catch (error) {
+    console.error("Error reading userData from localStorage:", error);
+    return null;
+  }
 };
 
 export const useSaveJournal = () => {
@@ -42,7 +51,7 @@ export const useSaveJournal = () => {
         content: content,
         userId: userIdNumber, // Send the userId as a number
       };
-      
+
       // --- End of the Fix ---
 
       // 5. POST the correctly typed JSON payload to the controller.
