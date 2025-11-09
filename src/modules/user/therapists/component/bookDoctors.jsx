@@ -5,7 +5,7 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import { z } from "zod";
 import { Calendar, Clock, MessageSquare, CheckCircle, User, Stethoscope } from "lucide-react";
 import { useBookAppointment } from "../api/book-appoinment";
-import {toast} from "react-toastify"
+import { toast } from "react-toastify"
 
 // Zod validation schema
 const AppointmentSchema = z.object({
@@ -144,13 +144,12 @@ export const AppointmentForm = ({ doctor, user, availableSlots = [], onSuccess, 
                           setSelectedSlot(slot);
                           setFieldValue("appointmentDateTime", slot.startTime);
                         }}
-                        className={`p-3 rounded-lg border text-sm transition-all ${
-                          slot.isBooked
+                        className={`p-3 rounded-lg border text-sm transition-all ${slot.isBooked
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
                             : selectedSlot?.id === slot.id
-                            ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                            : "bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50"
-                        }`}
+                              ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                              : "bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50"
+                          }`}
                       >
                         <div className="font-medium">
                           {new Date(slot.startTime).toLocaleDateString()}
@@ -198,6 +197,7 @@ export const AppointmentForm = ({ doctor, user, availableSlots = [], onSuccess, 
                       as="select"
                       name="durationMinutes"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={(e) => setFieldValue("durationMinutes", parseInt(e.target.value))}
                     >
                       <option value={15}>15 minutes</option>
                       <option value={30}>30 minutes</option>
@@ -206,6 +206,7 @@ export const AppointmentForm = ({ doctor, user, availableSlots = [], onSuccess, 
                       <option value={90}>1.5 hours</option>
                       <option value={120}>2 hours</option>
                     </Field>
+
                     <ErrorMessage
                       name="durationMinutes"
                       component="div"

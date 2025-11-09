@@ -8,7 +8,7 @@ import ProtectedRoute from "./protectedRoutes";
 export const therapistRoutes = [
   {
     path: paths.therapists.root.path,
-    element: <ProtectedRoute allowedRoles={['Doctor', 'Admin']}> {/* User role should be able to apply */}
+    element: <ProtectedRoute allowedRoles={['Doctor', 'Admin']}>
       <Outlet />
     </ProtectedRoute>,
     ErrorBoundary: AppRootErrorBoundary,
@@ -16,14 +16,21 @@ export const therapistRoutes = [
       {
         element: <AuthRoot />,
         children: [
-          
+
           {
             path: paths.therapists.therapistDashboard.path,
             lazy: async () => {
               const { TherapistDashboard } = await import("../../../modules/therapists/dashboard/components/daashboard"); // Example component
               return { Component: TherapistDashboard };
             }
-          }
+          }, {
+            path: paths.therapists.onboarding.path,
+            lazy: async () => {
+              const { DoctorRegistrationPage } = await import("../../routes/therapists/registrationPage");
+              return { Component: DoctorRegistrationPage };
+            },
+          },
+         
         ],
       },
     ],

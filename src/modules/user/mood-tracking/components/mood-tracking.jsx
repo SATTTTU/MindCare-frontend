@@ -7,7 +7,18 @@ import { JournalComponent } from '../../journel/components/inputJournel';
 import { api } from '@/lib/api-client';
 import { useNavigate } from 'react-router-dom';
 
-const getUserId = () => localStorage.getItem('userId');
+const getUserId = () => {
+    const userData = localStorage.getItem('userData'); // fetch the JSON string
+    if (!userData) return null; // handle missing data
+    try {
+        const user = JSON.parse(userData); // parse it
+        return user.id; // return the ID
+    } catch (err) {
+        console.error('Failed to parse userData:', err);
+        return null;
+    }
+};
+
 
 const apiSentimentToUiMood = {
     anxiety: "anxious", bipolar: "overwhelmed", depression: "sad",
@@ -54,9 +65,9 @@ export const MoodTracker = () => {
         try {
             const response = await api.get(`/api/JournalEntries/user/${userId}`);
             const history = response;
-            
+
             const processedEntries = history?.map(entry => {
-                let detectedApiMood = 'normal'; 
+                let detectedApiMood = 'normal';
                 if (entry.sentiments) {
                     const foundMood = Object.keys(entry.sentiments).find(key => entry.sentiments[key] === true);
                     if (foundMood) {
@@ -64,12 +75,12 @@ export const MoodTracker = () => {
                     }
                 }
                 const uiMood = apiSentimentToUiMood[detectedApiMood] || 'calm';
-                return { 
-                    ...entry, 
-                    predictedMood: uiMood 
+                return {
+                    ...entry,
+                    predictedMood: uiMood
                 };
             }).sort((a, b) => new Date(b.entryDate) - new Date(a.entryDate));
-             console.log("Data being set to state:", processedEntries);
+            console.log("Data being set to state:", processedEntries);
             setAllMoodEntries(processedEntries);
             setStreak(calculateStreak(processedEntries));
         } catch (error) {
@@ -86,8 +97,8 @@ export const MoodTracker = () => {
     }, [fetchMoodHistory]);
 
     const handleSubmitSuccess = () => {
-        setShowEntryForm(false); 
-        fetchMoodHistory(); 
+        setShowEntryForm(false);
+        fetchMoodHistory();
     };
 
     if (isLoading) {
@@ -109,11 +120,11 @@ export const MoodTracker = () => {
                     >
                         <ArrowLeft className="h-6 w-6 text-slate-700" />
                     </button>
-                    
+
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-700 to-indigo-600 bg-clip-text text-transparent text-center">
                         Mood Tracker
                     </h1>
-                    
+
                     <div className="flex items-center space-x-2 bg-gradient-to-r from-indigo-100 to-purple-100 px-4 py-2 rounded-full border border-indigo-200">
                         <Flame className="text-orange-500" />
                         <span className="text-sm font-semibold text-indigo-700">
@@ -125,23 +136,23 @@ export const MoodTracker = () => {
                 <Analytics entries={allMoodEntries} />
 
                 <section className="my-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-indigo-100 shadow-sm">
-                     <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center">
                         <div>
                             <h3 className="text-xl font-semibold mb-2 text-slate-700">How are you feeling?</h3>
                             <p className="text-slate-600">Log your mood to discover patterns.</p>
                         </div>
-                        <button 
-                            onClick={() => setShowEntryForm(prev => !prev)} 
+                        <button
+                            onClick={() => setShowEntryForm(prev => !prev)}
                             className={`px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 text-white ${showEntryForm ? 'bg-gradient-to-r from-red-500 to-pink-600' : 'bg-gradient-to-r from-indigo-500 to-purple-600'}`}>
                             {showEntryForm ? 'Cancel' : "Log Today's Mood"}
                         </button>
                     </div>
-                     <AnimatePresence>
+                    <AnimatePresence>
                         {showEntryForm && <JournalComponent onSubmissionSuccess={handleSubmitSuccess} />}
                     </AnimatePresence>
                 </section>
-                
-                <Calendar entries={allMoodEntries} onDayClick={() => {}} />
+
+                <Calendar entries={allMoodEntries} onDayClick={() => { }} />
             </div>
         </div>
     );

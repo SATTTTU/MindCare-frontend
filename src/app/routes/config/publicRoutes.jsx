@@ -3,15 +3,15 @@
 import { paths } from "@/config/paths";
 
 export const publicRoutes = [
-   {
-          path: paths.user.homepage.path, // e.g., '/dashboard'
-          lazy: async () => {
-            const { HomePageRoute } = await import(
-              "../../routes/user/homepage/homepage"
-            );
-            return { Component: HomePageRoute };
-          },
-        },
+  {
+    path: paths.user.homepage.path, // e.g., '/dashboard'
+    lazy: async () => {
+      const { HomePageRoute } = await import(
+        "../../routes/user/homepage/homepage"
+      );
+      return { Component: HomePageRoute };
+    },
+  },
   // These routes DO NOT have a <ProtectedRoute> wrapper.
   {
     path: paths.user.register.path,
@@ -48,20 +48,13 @@ export const publicRoutes = [
       );
       return { Component: TermsOfService };
     },
-    
+
   },
-   {
-              path: paths.therapists.onboarding.path,
-              lazy: async () => {
-                const { DoctorRegistrationPage } = await import("../../routes/therapists/registrationPage");
-                return { Component: DoctorRegistrationPage };
-              },
-            },
-            {
-              path: paths.therapists.applicationReview.path,
-              lazy: async () => {
-                const { ApplicationReviewPage } = await import("../../../modules/therapists/therapist/components/reviewPage"); // Example component
-                return { Component: ApplicationReviewPage };
-              }
-            },
+  {
+    path: paths.therapists.applicationReview.path,
+    lazy: async () => {
+      const { ApplicationReviewPage } = await import("../../../modules/therapists/therapist/components/reviewPage"); // Example component
+      return { Component: ApplicationReviewPage };
+    }
+  },
 ];

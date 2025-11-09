@@ -1,30 +1,42 @@
 import React, { useState } from 'react';
 import { Menu, X, Heart, User, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { clearAuthData } from '@/lib/api-client';
 
 const Header = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  
+
   const token = localStorage.getItem('user_token');
   const role = localStorage.getItem('user_type');
   const isAuthenticated = !!token;
 
   const navigation = [
     { name: 'Be a  Therapist', href: '/register-as-therapist' },
-   
+
   ];
 
   const handleSignOut = () => {
-    localStorage.removeItem('authToken');
-    window.location.href = '/';
+    // Clear all stored auth data
+    clearAuthData(); // your custom function
+    localStorage.removeItem('userData');
+    localStorage.removeItem('user_token');
+    localStorage.removeItem('user_type');
+
+    // Reset AuthContext state
+    setUser(null);
+    setToken(null);
+
+    // Redirect to login page
+    navigate('/login', { replace: true });
   };
+
 
   const dashboardLink =
     role === 'Doctor'
       ? '/doctor-dashboard'
       : role === 'Admin'
-      ? '/admin-dashboard'
-      : '/user-dashboard';
+        ? '/admin-dashboard'
+        : '/user-dashboard';
 
   return (
     <>
@@ -69,9 +81,9 @@ const Header = () => {
                     Sign In
                   </button>
                 </Link>
-                <button className="px-4 py-2 bg-purple-400 text-white rounded-lg hover:bg-purple-500 transition-colors duration-200">
+                <Link to="/register" className="px-4 py-2 bg-purple-400 text-white rounded-lg hover:bg-purple-500 transition-colors duration-200">
                   Get Started
-                </button>
+                </Link>
               </>
             ) : (
               <>
@@ -82,7 +94,7 @@ const Header = () => {
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                  className="flex items-center cursor-pointer px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                 >
                   Sign Out
                 </button>
@@ -111,9 +123,8 @@ const Header = () => {
 
       {/* Mobile Drawer */}
       <aside
-        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 z-50 md:hidden ${
-          isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 z-50 md:hidden ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
       >
         <div className="p-4">
           {/* Close button */}
