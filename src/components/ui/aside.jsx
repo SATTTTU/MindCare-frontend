@@ -21,8 +21,6 @@ export const Sidebar = () => {
     { to: "/therapists", icon: <CiUser />, text: "Therapists" },
     { to: "/mood-tracking", icon: <FaCookie />, text: "Mood Tracking" },
     { to: "/blogs", icon: <CiViewBoard />, text: "Blogs" },
-    { to: "/activities", icon: <MdPayments />, text: "Wellness Activities" },
-    { to: "/help", icon: <TbReportSearch />, text: "Help & Supports" },
   ];
 
   const handleLogout = async () => {
